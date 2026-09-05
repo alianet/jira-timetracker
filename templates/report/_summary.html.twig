@@ -1,0 +1,5 @@
+<section class="summary" aria-label="{{ t('report.title') }}">
+    <article><span>{{ t('report.total') }}</span><strong>{{ report.totalHours|number_format(2, ',', ' ') }} h</strong></article>
+    <article><span>{{ t('report.working_days') }}</span><strong>{{ report.totalDays|number_format(2, ',', ' ') }}</strong></article>
+    <article><span>{{ t('report.issues_count') }}</span><strong>{{ report.rows|length }}</strong></article>
+</section>

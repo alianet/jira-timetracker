@@ -1,0 +1,67 @@
+    <header class="page-header">
+        <nav class="top-navbar" aria-label="{{ t('report.nav_aria') }}">
+            <div class="brand-group">
+                <a class="home-link eyebrow" href="/" aria-label="{{ t('report.home_aria') }}">{{ t('app.brand') }}</a>
+                <h1>{{ t('report.heading') }}</h1>
+            </div>
+            <div class="account-bar">
+                {% include '_locale_switcher.html.twig' %}
+                <a href="{{ report.siteUrl }}" target="_blank" rel="noopener">{{ report.siteName }}</a>
+                <form method="post" action="/logout">
+                    <input type="hidden" name="csrf_token" value="{{ report.csrfToken }}">
+                    <button type="submit" class="button-link">{{ t('auth.logout') }}</button>
+                </form>
+            </div>
+        </nav>
+        <div class="report-toolbar">
+            <div class="report-context">
+                <p class="report-period"><span>{{ t('report.period') }}</span>{{ report.startDate }} – {{ report.endDate }}</p>
+                <div class="report-user" aria-label="{{ t('report.user') }}">
+                    {% if report.avatarUrl %}<img src="{{ report.avatarUrl }}" alt="">{% endif %}
+                    <span>{{ t('report.user') }}</span><strong>{{ report.displayName }}</strong>
+                    {% if not report.isOwnReport %}<a href="/?month={{ report.month }}&year={{ report.year }}">{{ t('report.show_my_time') }}</a>{% endif %}
+                </div>
+            </div>
+            <form method="get" class="filters">
+                <input type="hidden" name="accountId" value="{{ report.accountId }}">
+                <label><span>{{ t('report.month') }}</span>
+                    <select name="month">
+                        {% for number, name in months %}
+                            <option value="{{ number }}" {{ number == report.month ? 'selected' }}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label><span>{{ t('report.year') }}</span>
+                    <select name="year">
+                        {% for option in report.years %}
+                            <option value="{{ option }}" {{ option == report.year ? 'selected' }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <nav class="period-navigation" aria-label="{{ t('report.period_navigation') }}">
+                    <a class="period-navigation-button" href="/?accountId={{ report.accountId|url_encode }}&amp;month={{ report.previousMonth }}&amp;year={{ report.previousYear }}"
+                       aria-label="{{ t('report.previous_month') }}" title="{{ t('report.previous_month') }}">&larr;</a>
+                    {% if not report.isCurrentPeriod %}
+                        <a class="period-current-button" href="/?accountId={{ report.accountId|url_encode }}&amp;month={{ report.currentMonth }}&amp;year={{ report.currentYear }}">{{ t('report.current_month') }}</a>
+                    {% endif %}
+                    <a class="period-navigation-button" href="/?accountId={{ report.accountId|url_encode }}&amp;month={{ report.nextMonth }}&amp;year={{ report.nextYear }}"
+                       aria-label="{{ t('report.next_month') }}" title="{{ t('report.next_month') }}">&rarr;</a>
+                </nav>
+                <button type="submit">{{ t('report.show_report') }}</button>
+                {% if report.exportEnabled %}
+                    <button type="submit" class="button-secondary" formaction="/export.csv">{{ t('report.download_csv') }}</button>
+                {% endif %}
+            </form>
+        </div>
+        <div class="user-picker">
+            <form class="user-search-form" id="user-search-form" role="search">
+                <label for="user-query">{{ t('report.find_user') }}
+                    <input id="user-query" type="search" minlength="2" autocomplete="off"
+                           placeholder="{{ t('report.user_placeholder') }}" required>
+                </label>
+                <button type="submit">{{ t('report.search') }}</button>
+            </form>
+            <div id="user-search-results" class="user-search-results" aria-live="polite"></div>
+            <p id="user-search-status" class="muted search-empty" aria-live="polite" hidden></p>
+        </div>
+    </header>

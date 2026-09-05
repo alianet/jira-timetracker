@@ -1,0 +1,69 @@
+    <dialog id="worklog-dialog" class="worklog-dialog"
+            data-default-worklog-date="{{ report.defaultWorklogDate }}"
+            data-searching="{{ t('searching') }}"
+            data-users-search-failed="{{ t('search.users_failed') }}"
+            data-users-search-empty="{{ t('search.no_users') }}"
+            data-issues-search-failed="{{ t('search.issues_failed') }}"
+            data-issues-search-empty="{{ t('search.no_issues') }}"
+            data-add-entry="{{ t('worklog.new_entry') }}"
+            data-edit-entry="{{ t('worklog.edit_entry') }}"
+            data-save-changes="{{ t('worklog.save_changes') }}"
+            data-add-in-jira="{{ t('worklog.add') }}"
+            data-save-in-jira="{{ t('worklog.save') }}"
+            data-no-comment="{{ t('worklog.no_comment') }}"
+            data-edit-button="{{ t('worklog.edit') }}"
+            data-delete-button="{{ t('worklog.delete') }}"
+            data-delete-confirm="{{ t('worklog.confirm_delete') }}"
+            data-log-time="{{ t('search.log_time') }}"
+            data-history-kind="{{ t('worklog.history') }}"
+            data-log-kind="{{ t('worklog.title') }}">
+        <form id="worklog-form" method="post" action="/worklogs" class="worklog-form">
+            <input type="hidden" name="csrf_token" value="{{ report.csrfToken }}">
+            <input type="hidden" name="issue" id="worklog-issue">
+            <input type="hidden" id="worklog-id">
+            <div class="dialog-heading">
+                <div><p class="eyebrow" id="worklog-dialog-kind">{{ t('worklog.title') }}</p>
+                    <h2 id="worklog-title">&nbsp;</h2>
+                    <p class="muted" id="worklog-summary"></p></div>
+                <button type="button" class="dialog-close" aria-label="{{ t('worklog.cancel') }}">×</button>
+            </div>
+            <div id="worklog-list-wrapper" class="worklog-list-wrapper" hidden>
+                <div class="worklog-list-heading"><p class="worklog-list-label">{{ t('worklog.old_entries') }}</p>
+                    <button id="worklog-new" type="button" class="worklog-new worklog-edit-only">＋ {{ t('worklog.new_button') }}</button>
+                </div>
+                <div id="worklog-list" class="worklog-list"></div>
+            </div>
+            <p id="worklog-mode" class="worklog-mode worklog-edit-only">{{ t('worklog.new_entry') }}</p>
+            <label class="worklog-edit-only">{{ t('worklog.date') }}
+                <input id="worklog-date" name="date" type="date" required>
+            </label>
+            <label class="worklog-edit-only">{{ t('worklog.time') }}
+                <input id="worklog-time" name="time_spent" type="text" placeholder="{{ t('worklog.time_placeholder') }}" required
+                       autofocus>
+            </label>
+            <div class="comment-tools worklog-edit-only">
+                <label>{{ t('worklog.comment') }}
+                    <textarea id="worklog-comment" name="comment" rows="5"
+                              placeholder="{{ t('worklog.comment_placeholder') }}"></textarea>
+                </label>
+                <div class="tag-picker" aria-label="{{ t('worklog.tags') }}">
+                    <span>{{ t('worklog.tags') }}</span>
+                    <div class="tag-cloud">
+                        {% for tag in report.worklogTags %}
+                            <button type="button" class="comment-tag" data-tag="{{ tag }}">{{ tag }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-actions worklog-edit-only">
+                <button type="button" class="button-secondary dialog-cancel">{{ t('worklog.cancel') }}</button>
+                <button id="worklog-submit" type="submit">{{ t('worklog.save') }}</button>
+            </div>
+        </form>
+        <form id="worklog-delete-form" method="post" hidden>
+            <input type="hidden" name="csrf_token" value="{{ report.csrfToken }}">
+            <input type="hidden" name="issue" id="delete-issue">
+            <input type="hidden" name="date" id="delete-date">
+            <input type="hidden" id="delete-worklog-id">
+        </form>
+    </dialog>

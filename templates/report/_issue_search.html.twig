@@ -1,0 +1,17 @@
+<section class="issue-search">
+    {% if not report.isOwnReport %}
+        <p class="readonly-note"><strong>{{ t('report.readonly') }}</strong> {{ t('report.readonly_description', {'{name}': report.displayName}) }}</p>
+    {% else %}
+        <form class="search-form" id="issue-search-form" role="search">
+            <label for="issue-query">{{ t('report.issue_search') }}</label>
+            <div class="search-row">
+                <input id="issue-query" name="q" type="search" minlength="2" autocomplete="off"
+                       placeholder="{{ t('report.issue_placeholder') }}" required>
+                <button type="submit">{{ t('report.search') }}</button>
+            </div>
+        </form>
+
+        <div id="issue-search-results" class="search-results" aria-live="polite"></div>
+        <p id="issue-search-status" class="muted search-empty" aria-live="polite" hidden></p>
+    {% endif %}
+</section>

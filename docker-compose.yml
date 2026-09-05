@@ -1,0 +1,26 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "127.0.0.1:81:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  php:
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+    environment:
+      COMPOSER_AUTH: ${COMPOSER_AUTH:-}
+      GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=accept-new
+      PHP_OPCACHE_ENABLED: ${PHP_OPCACHE_ENABLED:-1}
+      SSH_AUTH_SOCK: /ssh-agent
+    restart: unless-stopped
