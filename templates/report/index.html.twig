@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ t('report.title') }} | {{ t('app.name') }}{% endblock %}
+{% block container_class %}report-container{% endblock %}
+
+{% block content %}
+    {% include 'report/_toolbar.html.twig' with {report: report} only %}
+
+    {% if report.saved %}
+        <div class="notice notice-success">{{ t('report.saved_notice') }}</div>
+    {% endif %}
+
+    <div class="overview-row">
+        {% include 'report/_summary.html.twig' with {report: report} only %}
+        {% include 'report/_issue_search.html.twig' with {report: report} only %}
+    </div>
+
+    {% include 'report/_matrix.html.twig' with {report: report} only %}
+    {% include 'report/_worklog_dialog.html.twig' with {report: report} only %}
+    <script src="/js/report.js" defer></script>
+{% endblock %}

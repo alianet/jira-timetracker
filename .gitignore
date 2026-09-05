@@ -1,0 +1,8 @@
+.env
+.env.local
+.idea
+vendor/
+.phpunit.cache
+.php-cs-fixer.cache
+.deptrac.cache
+var/log/*.log

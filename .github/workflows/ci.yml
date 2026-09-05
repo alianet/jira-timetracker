@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build PHP image
+        run: docker compose build php
+
+      - name: Install dependencies
+        run: docker compose run --rm -T php composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run quality checks
+        run: docker compose run --rm -T php composer php:all
+
+      - name: Audit dependencies
+        run: docker compose run --rm -T php composer audit --locked --no-interaction

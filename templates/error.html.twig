@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ t('error.title') }} | {{ t('app.name') }}{% endblock %}
+{% block content %}
+    <section class="error-card">
+        <p class="eyebrow">{{ t('error.eyebrow') }}</p>
+        <h1>{{ t('error.heading') }}</h1>
+        <p>{{ message }}</p>
+        <a class="button error-back" href="/">{{ t('error.back') }}</a>
+    </section>
+{% endblock %}

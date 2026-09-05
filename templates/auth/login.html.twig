@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ t('auth.title') }} | {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+    <section class="login-card">
+        {% include '_locale_switcher.html.twig' %}
+        <p class="eyebrow">{{ t('auth.eyebrow') }}</p>
+        <h1>{{ t('app.name') }}</h1>
+        <p class="muted">
+            {% if accountType == 'company' %}
+                {{ t('auth.company.description') }}
+            {% else %}
+                {{ t('auth.individual.description') }}
+            {% endif %}
+        </p>
+        <a class="button login-button" href="/login">
+            {% if accountType == 'company' %}
+                {{ t('auth.company.button') }}
+            {% else %}
+                {{ t('auth.individual.button') }}
+            {% endif %}
+        </a>
+    </section>
+{% endblock %}

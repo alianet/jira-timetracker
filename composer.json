@@ -1,0 +1,73 @@
+{
+    "name": "alianet/jira-timetracker",
+    "description": "A web application for tracking Jira worklogs and exporting monthly time reports",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mariusz Kaczanowski",
+            "email": "m.kaczanowski@alianet.pl",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "ext-curl": "*",
+        "ext-sodium": "*",
+        "ext-uri": "*",
+        "twig/twig": "^3.0",
+        "symfony/http-client": "^7.4",
+        "thecodingmachine/safe": "^3.4",
+        "symfony/routing": "^7.4",
+        "umulmrum/holiday": "dev-master#66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
+        "symfony/dotenv": "^7.4",
+        "symfony/translation": "^7.4",
+        "monolog/monolog": "^3.0",
+        "alianet/env-sync": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.2",
+        "thecodingmachine/phpstan-safe-rule": "^1.4",
+        "phpstan/extension-installer": "^1.4",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpunit/phpunit": "^12.5",
+        "deptrac/deptrac": "^4.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "php:static": "php -d memory_limit=512M vendor/bin/phpstan analyse --no-progress",
+        "php:unit": "phpunit",
+        "php:architecture": "deptrac analyse --config-file=deptrac.php --no-progress",
+        "php:lint": "find src public -type f -name '*.php' -print0 | xargs -0 -n1 php -l",
+        "php:cs": "php-cs-fixer fix --dry-run --diff --show-progress=dots",
+        "php:cs:fix": "php-cs-fixer fix --diff --show-progress=dots",
+        "php:all": [
+            "@php:lint",
+            "@php:architecture",
+            "@php:static",
+            "@php:unit",
+            "@php:cs"
+        ],
+        "php:all:fix": [
+            "@php:lint",
+            "@php:architecture",
+            "@php:static",
+            "@php:unit",
+            "@php:cs:fix"
+        ]
+    }
+}

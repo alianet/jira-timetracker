@@ -1,0 +1,75 @@
+    <section class="table-card">
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                <tr>
+                    <th class="issue-column">{{ t('report.task') }}</th>
+                    {% for day in report.days %}
+                    <th class="day-column numeric {{ day.cssClasses }}"
+                            title="{{ day.title }}">
+                            {% set filterTitle = t('report.filter_day', {'{date}': day.date}) %}
+                            {% set dayButtonTitle = day.title ? day.title ~ ' — ' ~ filterTitle : filterTitle %}
+                            <button type="button" class="day-filter"
+                                    data-day="{{ day.number }}"
+                                    aria-pressed="false"
+                                    title="{{ dayButtonTitle }}"
+                                    aria-label="{{ dayButtonTitle }}">
+                                <span class="day-number">{{ day.number }}</span><br />
+                                <span class="weekday-short">{{ t('calendar.weekday.short.' ~ day.weekday) }}</span>
+                            </button>
+                        </th>
+                    {% endfor %}
+                    <th class="total-column numeric">{{ t('report.total') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in report.rows %}
+                    <tr class="task-row">
+                        <th class="issue-column" scope="row">
+                            <a href="{{ row.url }}" target="_blank" rel="noopener">{{ row.issue }}</a>
+                            <span title="{{ row.summary }}">{{ row.summary }}</span>
+                        </th>
+                        {% for day in report.days %}
+                            {% set hours = row.dailyHours[day.number] %}
+                            <td class="numeric {{ hours > 0 ? 'has-hours' }} {{ day.cssClasses }}"
+                                data-day="{{ day.number }}" data-has-hours="{{ hours > 0 ? 'true' : 'false' }}">
+                                {% if report.isOwnReport %}<button type="button" class="worklog-trigger"
+                                        data-issue="{{ row.issue }}"
+                                        data-summary="{{ row.summary }}"
+                                        data-date="{{ day.date }}"
+                                        data-worklogs="{{ row.dailyWorklogs[day.number]|json_encode|e('html_attr') }}"
+                                        title="{{ hours > 0 ? t('report.edit_or_add') : t('report.log_time') }}: {{ row.issue }}, {{ day.date }}">{{ hours > 0 ? hours|number_format(2, ',', ' ') ~ ' ✎' : '＋' }}</button>{% elseif hours > 0 %}<button type="button" class="worklog-trigger worklog-view-trigger"
+                                        data-issue="{{ row.issue }}"
+                                        data-summary="{{ row.summary }}"
+                                        data-date="{{ day.date }}"
+                                        data-readonly="true"
+                                        data-worklogs="{{ row.dailyWorklogs[day.number]|json_encode|e('html_attr') }}"
+                                        title="{{ t('report.view_worklogs') }}: {{ row.issue }}, {{ day.date }}">{{ hours|number_format(2, ',', ' ') }}</button>{% else %}—{% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="total-column numeric">
+                            <strong>{{ row.totalHours|number_format(2, ',', ' ') }}</strong></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="{{ report.days|length + 2 }}" class="empty">{{ t('report.no_entries') }}</td>
+                    </tr>
+                {% endfor %}
+                {% if report.rows %}
+                    <tr id="day-filter-empty" hidden>
+                        <td colspan="{{ report.days|length + 2 }}" class="empty">{{ t('report.no_entries_for_day') }}</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+                <tfoot>
+                <tr>
+                <th class="issue-column" scope="row">{{ t('report.day_total') }}</th>
+                    {% for day in report.days %}
+                        <td class="numeric {{ day.cssClasses }}">{{ day.totalHours > 0 ? day.totalHours|number_format(2, ',', ' ') : '—' }}</td>
+                    {% endfor %}
+                    <td class="total-column numeric"><strong>{{ report.totalHours|number_format(2, ',', ' ') }}</strong></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>

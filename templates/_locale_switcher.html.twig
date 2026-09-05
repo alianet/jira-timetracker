@@ -1,0 +1,11 @@
+{% if availableLocales|default([])|length > 1 %}
+    <div class="locale-switcher">
+        <label for="locale-select">{{ t('locale.label') }}
+            <select id="locale-select">
+                {% for locale in availableLocales %}
+                    <option value="{{ locale }}" {{ locale == currentLocale ? 'selected' : '' }}>{{ t('locale.' ~ locale) }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+{% endif %}
