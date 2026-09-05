@@ -16,12 +16,12 @@
         "ext-sodium": "*",
         "ext-uri": "*",
         "twig/twig": "^3.0",
-        "symfony/http-client": "^7.4",
+        "symfony/http-client": "^8.1",
         "thecodingmachine/safe": "^3.4",
-        "symfony/routing": "^7.4",
+        "symfony/routing": "^8.1",
         "umulmrum/holiday": "dev-master#66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
-        "symfony/dotenv": "^7.4",
-        "symfony/translation": "^7.4",
+        "symfony/dotenv": "^8.1",
+        "symfony/translation": "^8.1",
         "monolog/monolog": "^3.0",
         "alianet/env-sync": "^1.0"
     },
@@ -40,7 +40,7 @@
         "thecodingmachine/phpstan-safe-rule": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "friendsofphp/php-cs-fixer": "^3.95",
-        "phpunit/phpunit": "^12.5",
+        "phpunit/phpunit": "^13.3",
         "deptrac/deptrac": "^4.7"
     },
     "config": {
