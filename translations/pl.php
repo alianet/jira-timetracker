@@ -40,6 +40,7 @@ return [
     'jira.error.forbidden' => 'Jira odmówiła wykonania tej operacji z powodu braku uprawnień.',
     'jira.error.not_found' => 'Nie znaleziono wskazanego zasobu w Jirze.',
     'jira.error.rate_limit' => 'Jira otrzymała zbyt wiele żądań. Spróbuj ponownie za chwilę.',
+    'jira.error.rate_limit_retry_after' => 'Jira otrzymała zbyt wiele żądań. Odczekaj {seconds} s i spróbuj ponownie.',
     'jira.error.generic' => 'Jira nie mogła wykonać operacji (HTTP {status}).',
 
     'report.title' => 'Raport czasu',

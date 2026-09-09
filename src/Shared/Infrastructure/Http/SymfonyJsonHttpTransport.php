@@ -40,6 +40,7 @@ final readonly class SymfonyJsonHttpTransport implements JsonHttpTransport
         try {
             $response = $this->httpClient->request($method, rtrim($this->baseUrl, '/') . $path, $options);
             $status = $response->getStatusCode();
+            $headers = $response->getHeaders(false);
             $content = $response->getContent(false);
         } catch (\Throwable $exception) {
             $this->logger->error('External HTTP request failed.', [
@@ -59,7 +60,7 @@ final readonly class SymfonyJsonHttpTransport implements JsonHttpTransport
                 'duration_ms' => self::duration($startedAt),
             ]);
 
-            throw HttpTransportException::unsuccessfulResponse($status, $content);
+            throw HttpTransportException::unsuccessfulResponse($status, $content, $headers);
         }
 
         $this->logger->debug('External HTTP request completed.', [

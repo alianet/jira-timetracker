@@ -40,6 +40,7 @@ return [
     'jira.error.forbidden' => 'Jira odmietla túto operáciu pre nedostatočné oprávnenia.',
     'jira.error.not_found' => 'Požadovaný prostriedok sa v Jire nenašiel.',
     'jira.error.rate_limit' => 'Jira prijala príliš veľa požiadaviek. Skúste to o chvíľu znova.',
+    'jira.error.rate_limit_retry_after' => 'Jira prijala príliš veľa požiadaviek. Počkajte {seconds} sekúnd a skúste to znova.',
     'jira.error.generic' => 'Jira nemohla dokončiť operáciu (HTTP {status}).',
 
     'report.title' => 'Prehľad času',

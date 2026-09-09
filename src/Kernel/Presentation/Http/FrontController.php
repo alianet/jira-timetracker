@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Kernel\Presentation\Http;
 
 use App\Kernel\Exception\ApplicationRuntimeException;
+use App\Kernel\Exception\RateLimitExceededException;
 use App\Kernel\Support\ApiValue;
 use Psr\Log\LoggerInterface;
 use Safe\Exceptions\UrlException;
@@ -69,6 +70,19 @@ final readonly class FrontController
             http_response_code(405);
             header('Allow: ' . implode(', ', $exception->getAllowedMethods()));
             echo $this->twig->render('error.html.twig', ['message' => $this->translator->trans('error.method_not_allowed')]);
+        } catch (RateLimitExceededException $exception) {
+            $this->logger->warning('External API rate limit exceeded during HTTP request.', [
+                'exception' => $exception,
+                'method' => $method,
+                'path' => $path,
+                'retry_after_seconds' => $exception->retryAfterSeconds,
+            ]);
+
+            http_response_code(429);
+            if ($exception->retryAfterSeconds !== null) {
+                header('Retry-After: ' . $exception->retryAfterSeconds);
+            }
+            $this->sendError($path, $exception->getMessage());
         } catch (\Throwable $exception) {
             $this->logger->error('Unhandled exception during HTTP request.', [
                 'exception' => $exception,
@@ -80,14 +94,21 @@ final readonly class FrontController
             $message = $exception instanceof ApplicationRuntimeException
                 ? $exception->getMessage()
                 : $this->translator->trans('error.unexpected');
-            if (str_starts_with($path, '/api/')) {
-                header('Content-Type: application/json; charset=UTF-8');
-                header('Cache-Control: no-store');
-                header('X-Content-Type-Options: nosniff');
-                echo json_encode(['error' => $message], JSON_THROW_ON_ERROR);
-            } else {
-                echo $this->twig->render('error.html.twig', ['message' => $message]);
-            }
+            $this->sendError($path, $message);
         }
+    }
+
+    private function sendError(string $path, string $message): void
+    {
+        if (str_starts_with($path, '/api/')) {
+            header('Content-Type: application/json; charset=UTF-8');
+            header('Cache-Control: no-store');
+            header('X-Content-Type-Options: nosniff');
+            echo json_encode(['error' => $message], JSON_THROW_ON_ERROR);
+
+            return;
+        }
+
+        echo $this->twig->render('error.html.twig', ['message' => $message]);
     }
 }

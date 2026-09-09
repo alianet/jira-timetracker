@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Tests\TimeTracking\Infrastructure\Jira;
 
 use App\Kernel\Exception\ApplicationRuntimeException as WorkLogRuntimeException;
+use App\Kernel\Exception\RateLimitExceededException;
 use App\Kernel\Infrastructure\Translation\TranslatorFactory;
 use App\Shared\Infrastructure\Http\SymfonyJsonHttpTransport;
 use App\TimeTracking\Infrastructure\Jira\JiraHttpClient;
@@ -61,6 +62,20 @@ final class JiraHttpClientTest extends TestCase
         $this->expectException(WorkLogRuntimeException::class);
         $this->expectExceptionMessage('Nie udało się połączyć z Jirą: timeout');
         $client->request('DELETE', '/worklog');
+    }
+
+    public function testMapsRateLimitAndRetryDelay(): void
+    {
+        $response = new MockResponse('', ['http_code' => 429, 'response_headers' => ['Retry-After: 42']]);
+        $client = new JiraHttpClient(new SymfonyJsonHttpTransport('https://api.test', new MockHttpClient($response)), $this->translator());
+
+        try {
+            $client->request('POST', '/worklog', []);
+            self::fail('Expected rate limit failure.');
+        } catch (RateLimitExceededException $exception) {
+            self::assertSame(42, $exception->retryAfterSeconds);
+            self::assertSame('Jira otrzymała zbyt wiele żądań. Odczekaj 42 s i spróbuj ponownie.', $exception->getMessage());
+        }
     }
 
     private function translator(): \Symfony\Contracts\Translation\TranslatorInterface

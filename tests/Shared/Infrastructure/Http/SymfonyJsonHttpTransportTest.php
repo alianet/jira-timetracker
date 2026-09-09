@@ -41,7 +41,10 @@ final class SymfonyJsonHttpTransportTest extends TestCase
     {
         $transport = new SymfonyJsonHttpTransport(
             'https://api.test',
-            new MockHttpClient(new MockResponse('{"providerError":"details"}', ['http_code' => 429])),
+            new MockHttpClient(new MockResponse('{"providerError":"details"}', [
+                'http_code' => 429,
+                'response_headers' => ['Retry-After: 42'],
+            ])),
         );
 
         try {
@@ -51,6 +54,7 @@ final class SymfonyJsonHttpTransportTest extends TestCase
             self::assertSame('unsuccessful_response', $exception->reason);
             self::assertSame(429, $exception->status);
             self::assertSame('{"providerError":"details"}', $exception->responseBody);
+            self::assertSame(['42'], $exception->responseHeaders['retry-after']);
         }
     }
 }

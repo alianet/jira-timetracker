@@ -8,8 +8,10 @@ declare(strict_types=1);
 namespace App\Identity\Infrastructure\Atlassian;
 
 use App\Kernel\Exception\ApplicationRuntimeException as WorkLogRuntimeException;
+use App\Kernel\Exception\RateLimitExceededException;
 use App\Shared\Infrastructure\Http\HttpTransportException;
 use App\Shared\Infrastructure\Http\JsonHttpTransport;
+use App\Shared\Infrastructure\Jira\JiraErrorResponse;
 use JsonException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,6 +28,9 @@ final readonly class AtlassianHttpClient implements AtlassianTransport
             return $this->transport->request($method, $path, null, $query);
         } catch (HttpTransportException $exception) {
             if ($exception->reason === 'unsuccessful_response') {
+                if ($exception->status === 429) {
+                    throw $this->rateLimitException($exception);
+                }
                 throw WorkLogRuntimeException::create($this->errorMessage($exception->status ?? 0, $exception->responseBody));
             }
             if ($exception->reason === 'unexpected_json_payload') {
@@ -36,6 +41,17 @@ final readonly class AtlassianHttpClient implements AtlassianTransport
                 $exception,
             );
         }
+    }
+
+    private function rateLimitException(HttpTransportException $exception): RateLimitExceededException
+    {
+        $retryAfter = $exception->retryAfterSeconds();
+
+        return RateLimitExceededException::withRetryAfter(
+            JiraErrorResponse::rateLimitMessage($exception, $this->translator),
+            $retryAfter,
+            $exception,
+        );
     }
 
     private function errorMessage(int $status, string $content): string
@@ -55,14 +71,7 @@ final readonly class AtlassianHttpClient implements AtlassianTransport
             }
         }
 
-        $summary = match ($status) {
-            400 => $this->translator->trans('jira.error.bad_request'),
-            401 => $this->translator->trans('jira.error.unauthorized'),
-            403 => $this->translator->trans('jira.error.forbidden'),
-            404 => $this->translator->trans('jira.error.not_found'),
-            429 => $this->translator->trans('jira.error.rate_limit'),
-            default => $this->translator->trans('jira.error.generic', ['{status}' => (string) $status]),
-        };
+        $summary = JiraErrorResponse::summary($status, $this->translator);
 
         return $messages === [] ? $summary : $summary . ' ' . implode(' ', $messages);
     }

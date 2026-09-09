@@ -40,6 +40,7 @@ return [
     'jira.error.forbidden' => 'Jira hat diesen Vorgang wegen unzureichender Berechtigungen abgelehnt.',
     'jira.error.not_found' => 'Die angeforderte Ressource wurde in Jira nicht gefunden.',
     'jira.error.rate_limit' => 'Jira hat zu viele Anfragen erhalten. Bitte versuchen Sie es in Kürze erneut.',
+    'jira.error.rate_limit_retry_after' => 'Jira hat zu viele Anfragen erhalten. Warten Sie {seconds} Sekunden und versuchen Sie es erneut.',
     'jira.error.generic' => 'Jira konnte den Vorgang nicht abschließen (HTTP {status}).',
 
     'report.title' => 'Zeitbericht',

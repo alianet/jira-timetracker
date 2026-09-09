@@ -40,6 +40,7 @@ return [
     'jira.error.forbidden' => 'Jira refused this operation due to insufficient permissions.',
     'jira.error.not_found' => 'The requested Jira resource was not found.',
     'jira.error.rate_limit' => 'Jira received too many requests. Please try again shortly.',
+    'jira.error.rate_limit_retry_after' => 'Jira received too many requests. Wait {seconds} seconds and try again.',
     'jira.error.generic' => 'Jira could not complete the operation (HTTP {status}).',
 
     'report.title' => 'Time report',

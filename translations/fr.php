@@ -40,6 +40,7 @@ return [
     'jira.error.forbidden' => 'Jira a refusé cette opération en raison d’autorisations insuffisantes.',
     'jira.error.not_found' => 'La ressource demandée est introuvable dans Jira.',
     'jira.error.rate_limit' => 'Jira a reçu trop de requêtes. Veuillez réessayer dans quelques instants.',
+    'jira.error.rate_limit_retry_after' => 'Jira a reçu trop de requêtes. Attendez {seconds} secondes avant de réessayer.',
     'jira.error.generic' => 'Jira n’a pas pu effectuer l’opération (HTTP {status}).',
 
     'report.title' => 'Rapport de temps',
