@@ -49,6 +49,14 @@
         }
     },
     "scripts": {
+        "env:check": "@php vendor/bin/env-sync diff",
+        "env:update": "@php vendor/bin/env-sync update",
+        "post-install-cmd": [
+            "@env:update"
+        ],
+        "post-update-cmd": [
+            "@env:update"
+        ],
         "php:static": "php -d memory_limit=512M vendor/bin/phpstan analyse --no-progress",
         "php:unit": "phpunit",
         "php:architecture": "deptrac analyse --config-file=deptrac.php --no-progress",
