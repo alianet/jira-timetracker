@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Kernel\Presentation\Http;
 
+use App\Kernel\Exception\ApplicationRuntimeException;
 use App\Kernel\Support\ApiValue;
 use Psr\Log\LoggerInterface;
 use Safe\Exceptions\UrlException;
@@ -76,7 +77,9 @@ final readonly class FrontController
             ]);
 
             http_response_code(500);
-            $message = $this->translator->trans('error.unexpected');
+            $message = $exception instanceof ApplicationRuntimeException
+                ? $exception->getMessage()
+                : $this->translator->trans('error.unexpected');
             if (str_starts_with($path, '/api/')) {
                 header('Content-Type: application/json; charset=UTF-8');
                 header('Cache-Control: no-store');

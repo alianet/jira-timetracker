@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Tests\Kernel\Presentation\Http;
 
+use App\Kernel\Exception\ApplicationRuntimeException;
 use App\Kernel\Presentation\Http\Dispatcher;
 use App\Kernel\Presentation\Http\FrontController;
 use App\Kernel\Presentation\Http\Request;
@@ -70,5 +71,43 @@ final class FrontControllerTest extends TestCase
         self::assertSame($exception, $record->context['exception']);
         self::assertSame('GET', $record->context['method']);
         self::assertSame($path, $record->context['path']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function applicationErrorResponses(): iterable
+    {
+        yield 'HTML' => ['/failure', 'Jira session expired'];
+        yield 'API' => ['/api/failure', '{"error":"Jira session expired"}'];
+    }
+
+    #[DataProvider('applicationErrorResponses')]
+    public function testExposesApplicationErrorMessageToTheUser(string $path, string $expectedBody): void
+    {
+        $exception = ApplicationRuntimeException::create('Jira session expired');
+        $route = new Route(
+            'failure',
+            $path,
+            ['GET'],
+            static function (Request $request) use ($exception): Response {
+                throw $exception;
+            },
+            true,
+        );
+        $dispatcher = new Dispatcher(new Router([$route]), static fn(array $session): ?Response => null);
+        $twig = new Environment(new ArrayLoader(['error.html.twig' => '{{ message }}']));
+        $translator = $this->createStub(TranslatorInterface::class);
+        $handler = new TestHandler();
+        $controller = new FrontController($dispatcher, $twig, $translator, new Logger('test', [$handler]));
+        $_GET = [];
+        $_POST = [];
+        $_SESSION = [];
+
+        ob_start();
+        $controller->handle(['REQUEST_URI' => $path, 'REQUEST_METHOD' => 'GET']);
+        $body = (string) ob_get_clean();
+
+        self::assertSame(500, http_response_code());
+        self::assertSame($expectedBody, $body);
+        self::assertTrue($handler->hasErrorThatContains('Unhandled exception during HTTP request.'));
     }
 }
