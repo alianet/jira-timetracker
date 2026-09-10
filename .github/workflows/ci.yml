@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 15
     env:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      COMPOSE_DISABLE_ENV_FILE: true
 
     steps:
       - name: Check out repository
