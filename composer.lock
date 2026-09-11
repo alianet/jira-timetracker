@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "782fb1b8caec3a63cd8247f38cc18d50",
+    "content-hash": "1097d484045abdf3d423ab631cffd4fd",
     "packages": [
         {
             "name": "alianet/env-sync",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alianet/env-sync.git",
-                "reference": "de974d64dfd760ba4bc0d9fcfe45ee0f24938a8c"
+                "reference": "0fa415affd359691489241d3aa7a923863e937f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alianet/env-sync/zipball/de974d64dfd760ba4bc0d9fcfe45ee0f24938a8c",
-                "reference": "de974d64dfd760ba4bc0d9fcfe45ee0f24938a8c",
+                "url": "https://api.github.com/repos/alianet/env-sync/zipball/0fa415affd359691489241d3aa7a923863e937f9",
+                "reference": "0fa415affd359691489241d3aa7a923863e937f9",
                 "shasum": ""
             },
             "require": {
@@ -61,7 +61,7 @@
                 "issues": "https://github.com/alianet/env-sync/issues",
                 "source": "https://github.com/alianet/env-sync"
             },
-            "time": "2026-09-09T16:59:59+00:00"
+            "time": "2026-09-11T16:14:31+00:00"
         },
         {
             "name": "monolog/monolog",

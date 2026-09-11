@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Tests\Kernel\Presentation\Http;
 
+use App\Identity\Application\Authentication\AccountType;
 use App\Identity\Application\Authentication\AuthenticationMode;
 use App\Identity\Application\Authentication\Connection;
 use App\Identity\Presentation\Http\Authorization;
@@ -147,7 +148,7 @@ final class HttpRoutingIntegrationTest extends TestCase
 
     public function testLoginRouteStaysPublicAndPrivateRoutesReturnSuitableLoginResponses(): void
     {
-        $authorization = $this->authorization(AuthenticationMode::InteractiveOAuth, 'company');
+        $authorization = $this->authorization(AuthenticationMode::InteractiveOAuth, AccountType::Company);
         $dispatcher = new Dispatcher($this->router(), $authorization->requireAuthenticated(...));
         $session = [];
 
@@ -165,7 +166,7 @@ final class HttpRoutingIntegrationTest extends TestCase
 
     public function testIndividualModeKeepsMissingTokenError(): void
     {
-        $authorization = $this->authorization(AuthenticationMode::PersonalToken, 'individual');
+        $authorization = $this->authorization(AuthenticationMode::PersonalToken, AccountType::Individual);
         $dispatcher = new Dispatcher($this->router(), $authorization->requireAuthenticated(...));
         $session = [];
 
@@ -194,7 +195,7 @@ final class HttpRoutingIntegrationTest extends TestCase
         ]);
     }
 
-    private function authorization(AuthenticationMode $mode, string $accountType): Authorization
+    private function authorization(AuthenticationMode $mode, AccountType $accountType): Authorization
     {
         return new Authorization(
             static fn(array &$session): Connection => Connection::unauthenticated($mode, 'https://jira.example'),

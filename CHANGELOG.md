@@ -3,6 +3,15 @@
 This file documents the most important changes introduced in each version of
 the application. The project follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Configuration and operations
+
+- Updated `alianet/env-sync` to 1.2.0 and added account-type-dependent checks
+  for individual API token credentials and company OAuth credentials.
+- Replaced string-based account-type handling with the typed `AccountType` enum
+  and centralized environment variable keys used by the application bootstrap.
+
 ## [1.1.0] - 2026-09-10
 
 ### Jira integration

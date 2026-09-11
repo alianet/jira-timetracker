@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Identity\Application\Authentication\AccessTokenStore;
+use App\Identity\Application\Authentication\AccountType;
 use App\Identity\Application\Authentication\AuthenticationMode;
 use App\Identity\Application\Authentication\AuthorizationGateway;
 use App\Identity\Application\Authentication\CompleteAuthorizationHandler;
@@ -76,10 +77,23 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Uri\InvalidUriException;
 use Uri\Rfc3986\Uri;
 
 final readonly class Bootstrap
 {
+    private const string ENV_LOG_LEVEL = 'LOG_LEVEL';
+    private const string ENV_JIRA_URL = 'JIRA_URL';
+    private const string ENV_SESSION_ENCRYPTION_KEY = 'SESSION_ENCRYPTION_KEY';
+    private const string ENV_HOLIDAY_COUNTRY = 'HOLIDAY_COUNTRY';
+    private const string ENV_HOLIDAY_CALENDAR_VERSION = 'HOLIDAY_CALENDAR_VERSION';
+    private const string ENV_ATLASSIAN_ACCOUNT_TYPE = 'ATLASSIAN_ACCOUNT_TYPE';
+    private const string ENV_ATLASSIAN_EMAIL = 'ATLASSIAN_EMAIL';
+    private const string ENV_ATLASSIAN_API_TOKEN = 'ATLASSIAN_API_TOKEN';
+    private const string ENV_ATLASSIAN_CLIENT_ID = 'ATLASSIAN_CLIENT_ID';
+    private const string ENV_ATLASSIAN_CLIENT_SECRET = 'ATLASSIAN_CLIENT_SECRET';
+    private const string ENV_ATLASSIAN_REDIRECT_URI = 'ATLASSIAN_REDIRECT_URI';
+
     private string $rootDirectory;
     private Config $config;
     private LocaleConfig $localeConfig;
@@ -99,21 +113,24 @@ final readonly class Bootstrap
         $this->twigFactory = new EnvironmentFactory();
     }
 
-    /** @param array<string, mixed> $server */
+    /**
+     * @param array<string, mixed> $server
+     * @throws InvalidUriException
+     */
     public function run(array $server): void
     {
         $logLevel = $this->config->choice(
-            'LOG_LEVEL',
+            self::ENV_LOG_LEVEL,
             ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'],
             'error',
         );
         $logger = new LoggerFactory()->create($this->rootDirectory . '/var/log/app.log', $logLevel);
         $accountType = $this->accountType();
-        if ($accountType === 'individual' && !new LocalhostRequestChecker()->isLocalhost($server)) {
+        if ($accountType === AccountType::Individual && !new LocalhostRequestChecker()->isLocalhost($server)) {
             http_response_code(403);
             header('Content-Type: text/plain; charset=UTF-8');
             header('Cache-Control: no-store');
-            echo 'Tryb individual jest dostępny wyłącznie przez localhost.';
+            echo 'Individual mode is available only on localhost.';
 
             return;
         }
@@ -139,10 +156,10 @@ final readonly class Bootstrap
         $twig->addGlobal('availableLocales', $this->localeConfig->locales);
         $twig->addGlobal('currentLocale', $locale);
         $twig->addGlobal('templateVariant', TemplateConfig::fromConfig($this->config)->variant);
-        $jiraUrl = $this->config->required('JIRA_URL');
+        $jiraUrl = $this->config->required(self::ENV_JIRA_URL);
         $baseHttpClient = HttpClient::create();
-        $sessionTokenCipher = $accountType === 'company'
-            ? new SessionTokenCipher($this->config->required('SESSION_ENCRYPTION_KEY'))
+        $sessionTokenCipher = $accountType === AccountType::Company
+            ? new SessionTokenCipher($this->config->required(self::ENV_SESSION_ENCRYPTION_KEY))
             : null;
         $twig->addGlobal('jiraFaviconUrl', $this->jiraFaviconUrl($jiraUrl));
         $tokenStore = fn(array &$session): SessionAccessTokenStore => new SessionAccessTokenStore(
@@ -159,8 +176,8 @@ final readonly class Bootstrap
         $exportConfig = ReportExportConfig::fromConfig($this->config);
         $workdayConfig = WorkdayConfig::fromConfig($this->config);
         $holidayCalendar = new HolidayCalendarFactory()->create(
-            $this->config->required('HOLIDAY_COUNTRY'),
-            $this->config->nullable('HOLIDAY_CALENDAR_VERSION') ?? HolidayCalendarFactory::VERSION_NATIONAL,
+            $this->config->required(self::ENV_HOLIDAY_COUNTRY),
+            $this->config->nullable(self::ENV_HOLIDAY_CALENDAR_VERSION) ?? HolidayCalendarFactory::VERSION_NATIONAL,
         );
         $dailySeconds = $workdayConfig->reportingDaySeconds;
         $reportTimezone = ReportTimeZone::fromName($workdayConfig->timezone);
@@ -286,7 +303,7 @@ final readonly class Bootstrap
     /**
      * @param array<string, mixed> $server
      */
-    private function persistLocale(string $locale, array $server): string
+    private function persistLocale(string $locale, array $server): void
     {
         $_SESSION['locale'] = $locale;
         \setcookie($this->localeConfig->cookieName, $locale, [
@@ -296,23 +313,28 @@ final readonly class Bootstrap
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
-
-        return $locale;
     }
 
-    private function accountType(): string
+    private function accountType(): AccountType
     {
-        $accountType = $this->config->choice('ATLASSIAN_ACCOUNT_TYPE', ['individual', 'company', 'app'], 'individual');
+        $accountType = $this->config->choice(
+            self::ENV_ATLASSIAN_ACCOUNT_TYPE,
+            AccountType::values(),
+            AccountType::Individual->value,
+        );
 
-        return $accountType === 'app' ? 'company' : $accountType;
+        return AccountType::from($accountType);
     }
 
+    /**
+     * @throws InvalidUriException
+     */
     private function jiraFaviconUrl(string $jiraUrl): string
     {
         $uri = new Uri($jiraUrl);
 
         if ($uri->getScheme() === null || $uri->getHost() === null) {
-            throw new \RuntimeException('JIRA_URL musi być pełnym adresem URL.');
+            throw new \RuntimeException(self::ENV_JIRA_URL . ' must be an absolute URL.');
         }
 
         return $uri
@@ -324,24 +346,24 @@ final readonly class Bootstrap
     }
 
     private function atlassianAccess(
-        string $accountType,
+        AccountType $accountType,
         string $jiraUrl,
         AccessTokenStore $tokenStore,
         HttpClientInterface $httpClient,
         LoggerInterface $logger,
     ): AuthorizationGateway&ConnectionProvider {
-        if ($accountType === 'individual') {
+        if ($accountType === AccountType::Individual) {
             return new AtlassianPersonalAccess(
                 $jiraUrl,
-                $this->config->required('ATLASSIAN_EMAIL'),
-                $this->config->required('ATLASSIAN_API_TOKEN'),
+                $this->config->required(self::ENV_ATLASSIAN_EMAIL),
+                $this->config->required(self::ENV_ATLASSIAN_API_TOKEN),
             );
         }
 
         return new AtlassianOAuth(
-            $this->config->required('ATLASSIAN_CLIENT_ID'),
-            $this->config->required('ATLASSIAN_CLIENT_SECRET'),
-            $this->config->required('ATLASSIAN_REDIRECT_URI'),
+            $this->config->required(self::ENV_ATLASSIAN_CLIENT_ID),
+            $this->config->required(self::ENV_ATLASSIAN_CLIENT_SECRET),
+            $this->config->required(self::ENV_ATLASSIAN_REDIRECT_URI),
             $jiraUrl,
             $httpClient,
             $tokenStore,
@@ -367,5 +389,4 @@ final readonly class Bootstrap
     {
         return static fn(string $issue): string => rtrim($siteUrl, '/') . '/browse/' . $issue;
     }
-
 }

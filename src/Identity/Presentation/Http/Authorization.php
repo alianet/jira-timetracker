@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Presentation\Http;
 
+use App\Identity\Application\Authentication\AccountType;
 use App\Identity\Application\Authentication\Connection;
 use App\Kernel\Exception\ApplicationRuntimeException;
 use App\Kernel\Presentation\Http\Response;
@@ -18,7 +19,7 @@ final readonly class Authorization
         /** @var \Closure(array<array-key, mixed>): Connection */
         private \Closure $connection,
         private Environment $twig,
-        private string $accountType,
+        private AccountType $accountType,
     ) {}
 
     /**
@@ -37,7 +38,7 @@ final readonly class Authorization
         }
 
         return Response::html($this->twig->render('auth/login.html.twig', [
-            'accountType' => $this->accountType,
+            'accountType' => $this->accountType->value,
         ]), 401);
     }
 }
