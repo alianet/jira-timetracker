@@ -10,6 +10,7 @@ namespace Tests\Reporting\Presentation\Http;
 use App\Kernel\Infrastructure\Translation\TranslatorFactory;
 use App\Kernel\Presentation\Http\Request;
 use App\Kernel\Presentation\Twig\EnvironmentFactory;
+use App\Kernel\Session\Session;
 use App\Reporting\Application\GenerateMonthlyReportHandler;
 use App\Reporting\Domain\ReportTimeZone;
 use App\Reporting\Domain\WorkdayPolicy;
@@ -66,13 +67,14 @@ final class ReportPageControllerTest extends TestCase
         );
         $controller = new ReportPageController(
             $twig,
-            static fn(array &$session): GenerateMonthlyReportHandler => $generate,
-            static fn(array &$session): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
+            static fn(): GenerateMonthlyReportHandler => $generate,
+            static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
             new WorklogTagProvider(),
             true,
             $timezone,
         );
-        $session = ['atlassian' => ['site_name' => 'Site', 'site_url' => 'https://site.test'], 'csrf_token' => 'csrf'];
+        $sessionData = ['atlassian' => ['site_name' => 'Site', 'site_url' => 'https://site.test'], 'csrf_token' => 'csrf'];
+        $session = new Session($sessionData);
 
         $response = $controller->show(new Request('GET', '/', ['year' => '2024', 'month' => '2', 'saved' => '1'], [], [], $session));
 
@@ -98,16 +100,17 @@ final class ReportPageControllerTest extends TestCase
         );
         $controller = new ReportPageController(
             $twig,
-            static fn(array &$session): GenerateMonthlyReportHandler => $generate,
-            static fn(array &$session): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
+            static fn(): GenerateMonthlyReportHandler => $generate,
+            static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
             new WorklogTagProvider(),
             true,
             $timezone,
         );
-        $session = [
+        $sessionData = [
             'atlassian' => ['site_name' => 'Example Jira', 'site_url' => 'https://site.test'],
             'csrf_token' => 'csrf-value',
         ];
+        $session = new Session($sessionData);
 
         $html = $controller->show(new Request(
             'GET',

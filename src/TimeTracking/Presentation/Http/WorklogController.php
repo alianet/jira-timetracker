@@ -24,9 +24,9 @@ use Psr\Log\NullLogger;
 final readonly class WorklogController
 {
     /**
-     * @param callable(array<array-key, mixed>&): AddWorklogHandler $addHandler
-     * @param callable(array<array-key, mixed>&): UpdateWorklogHandler $updateHandler
-     * @param callable(array<array-key, mixed>&): DeleteWorklogHandler $deleteHandler
+     * @param callable(): AddWorklogHandler $addHandler
+     * @param callable(): UpdateWorklogHandler $updateHandler
+     * @param callable(): DeleteWorklogHandler $deleteHandler
      */
     public function __construct(
         private mixed $addHandler,
@@ -38,7 +38,7 @@ final readonly class WorklogController
     public function create(Request $request): Response
     {
         $this->verifyCsrf($request);
-        $saved = ($this->addHandler)($request->session)->handle(new AddWorklog(
+        $saved = ($this->addHandler)()->handle(new AddWorklog(
             $this->field($request, 'issue'),
             $this->field($request, 'date'),
             $this->field($request, 'time_spent'),
@@ -56,7 +56,7 @@ final readonly class WorklogController
     public function update(Request $request): Response
     {
         $this->verifyCsrf($request);
-        $saved = ($this->updateHandler)($request->session)->handle(new UpdateWorklog(
+        $saved = ($this->updateHandler)()->handle(new UpdateWorklog(
             $this->field($request, 'issue'),
             $this->field($request, 'date'),
             ApiValue::stringValue($request->attributes['id'] ?? null),
@@ -76,7 +76,7 @@ final readonly class WorklogController
     public function delete(Request $request): Response
     {
         $this->verifyCsrf($request);
-        $saved = ($this->deleteHandler)($request->session)->handle(new DeleteWorklog(
+        $saved = ($this->deleteHandler)()->handle(new DeleteWorklog(
             $this->field($request, 'issue'),
             $this->field($request, 'date'),
             ApiValue::stringValue($request->attributes['id'] ?? null),
@@ -109,7 +109,7 @@ final readonly class WorklogController
     private function verifyCsrf(Request $request): void
     {
         if (!hash_equals(
-            ApiValue::stringValue($request->session['csrf_token'] ?? null),
+            ApiValue::stringValue($request->session->get('csrf_token')),
             $this->field($request, 'csrf_token'),
         )) {
             $this->logger->warning('Worklog operation rejected because of invalid CSRF token.', [

@@ -5,12 +5,35 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Architecture
+
+- Replaced the manually assembled application object graph with a compiled Symfony
+  dependency injection container and centralized service definitions.
+- Encapsulated PHP session state in an injectable session service and decoupled HTTP
+  request authorization from the dispatcher.
+
 ### Configuration and operations
 
+- Added the `composer cache:container:warmup` command and automatic container warmup
+  after Composer install and update operations.
+- Production requests now require the prebuilt container cache, while debug mode
+  automatically rebuilds stale cache entries after tracked source changes.
+- Container cache writes are atomic and the Docker entrypoint prepares cache directory
+  permissions for both deployment warmup and application runtime access.
 - Updated `alianet/env-sync` to 1.2.0 and added account-type-dependent checks
   for individual API token credentials and company OAuth credentials.
 - Replaced string-based account-type handling with the typed `AccountType` enum
   and centralized environment variable keys used by the application bootstrap.
+
+### Dependencies
+
+- Added Symfony Config and DependencyInjection 8.1 components for container
+  compilation, resource tracking, and cache freshness checks.
+
+### Documentation
+
+- Documented container cache warmup, automatic Composer hooks, clean rebuilds, and
+  deployment precautions in every supported README language.
 
 ## [1.1.0] - 2026-09-10
 

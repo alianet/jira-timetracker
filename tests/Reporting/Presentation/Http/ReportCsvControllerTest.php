@@ -9,6 +9,7 @@ namespace Tests\Reporting\Presentation\Http;
 
 use App\Kernel\Exception\ApplicationRuntimeException;
 use App\Kernel\Presentation\Http\Request;
+use App\Kernel\Session\Session;
 use App\Reporting\Application\ExportedFile;
 use App\Reporting\Application\ExportMonthlyReportHandler;
 use App\Reporting\Application\Port\ReportExporter;
@@ -19,6 +20,7 @@ use App\Reporting\Domain\ReportTimeZone;
 use App\Reporting\Domain\WorklogAuthorId;
 use App\Reporting\Presentation\Http\ReportCsvController;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ReportCsvControllerTest extends TestCase
 {
@@ -43,13 +45,16 @@ final class ReportCsvControllerTest extends TestCase
             }
         };
         $handler = new ExportMonthlyReportHandler($source, $exporter);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::never())->method('trans');
         $controller = new ReportCsvController(
-            static fn(array &$session): ExportMonthlyReportHandler => $handler,
+            static fn(): ExportMonthlyReportHandler => $handler,
             true,
-            'disabled',
+            $translator,
             ReportTimeZone::fromName('Europe/Warsaw'),
         );
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
 
         $response = $controller->export(new Request(
             'GET',
@@ -71,15 +76,21 @@ final class ReportCsvControllerTest extends TestCase
 
     public function testDisabledExportKeepsExistingErrorBeforeResolvingHandler(): void
     {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::once())
+            ->method('trans')
+            ->with('csv.export_disabled')
+            ->willReturn('Eksport raportu jest wyłączony.');
         $controller = new ReportCsvController(
-            static function (array &$session): ExportMonthlyReportHandler {
+            static function (): ExportMonthlyReportHandler {
                 self::fail('Disabled export must not resolve its handler.');
             },
             false,
-            'Eksport raportu jest wyłączony.',
+            $translator,
             ReportTimeZone::fromName('Europe/Warsaw'),
         );
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
 
         $this->expectException(ApplicationRuntimeException::class);
         $this->expectExceptionMessage('Eksport raportu jest wyłączony.');
@@ -89,15 +100,18 @@ final class ReportCsvControllerTest extends TestCase
 
     public function testRejectsInvalidAccountIdAtHttpBoundary(): void
     {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::never())->method('trans');
         $controller = new ReportCsvController(
-            static function (array &$session): ExportMonthlyReportHandler {
+            static function (): ExportMonthlyReportHandler {
                 self::fail('Invalid accountId must be rejected before resolving the handler.');
             },
             true,
-            'disabled',
+            $translator,
             ReportTimeZone::fromName('Europe/Warsaw'),
         );
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid worklog author identifier.');

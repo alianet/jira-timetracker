@@ -82,6 +82,36 @@ docker compose exec php composer --version
 docker compose exec php composer install
 ```
 
+## Cache du conteneur
+
+Avec `LOG_LEVEL=debug`, chaque requête utilise les contrôles de ressources de Symfony
+`ConfigCache`. Toute modification de `config/services.php`, des fichiers PHP sous
+`src/` ou de `ContainerFactory` invalide et reconstruit automatiquement le cache
+compilé du conteneur.
+
+En production, les requêtes chargent uniquement le cache précompilé et n’analysent
+jamais les fichiers source. Composer le réchauffe automatiquement après `install` et
+`update` grâce aux scripts `post-install-cmd` et `post-update-cmd`. Si un déploiement
+ne réinstalle pas les dépendances ou exécute Composer avec `--no-scripts`, réchauffez
+explicitement le cache après le déploiement du nouveau code et avant de diriger le
+trafic vers la nouvelle version :
+
+```bash
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Le réchauffement remplace atomiquement le cache du conteneur ; les déploiements
+ordinaires ne nécessitent donc aucun nettoyage préalable. Si une reconstruction propre
+est nécessaire pendant l’arrêt de l’application, supprimez uniquement les artefacts
+générés, puis relancez le réchauffement :
+
+```bash
+rm -f var/cache/container/AppContainer.php var/cache/container/AppContainer.php.meta var/cache/container/AppContainer.php.meta.json
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Ne supprimez pas l’intégralité du répertoire `var/cache`.
+
 L’application est un monolithe modulaire orienté DDD, avec `Identity`, `Reporting` et
 `TimeTracking` comme modules métier. `Shared` constitue un petit noyau de domaine
 partagé, tandis que les aspects techniques de l’hébergement se trouvent dans `Kernel`.

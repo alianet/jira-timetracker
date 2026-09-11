@@ -12,9 +12,11 @@ use App\Kernel\Exception\RateLimitExceededException;
 use App\Kernel\Presentation\Http\Dispatcher;
 use App\Kernel\Presentation\Http\FrontController;
 use App\Kernel\Presentation\Http\Request;
+use App\Kernel\Presentation\Http\RequestAuthorization;
 use App\Kernel\Presentation\Http\Response;
 use App\Kernel\Presentation\Http\Route;
 use App\Kernel\Presentation\Http\Router;
+use App\Kernel\Session\Session;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -46,7 +48,8 @@ final class FrontControllerTest extends TestCase
             },
             true,
         );
-        $dispatcher = new Dispatcher(new Router([$route]), static fn(array $session): ?Response => null);
+        $sessionData = [];
+        $dispatcher = new Dispatcher(new Router([$route]), new AllowAllAuthorization(), new Session($sessionData));
         $twig = new Environment(new ArrayLoader(['error.html.twig' => '{{ message }}']));
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturn('A safe error page');
@@ -54,7 +57,6 @@ final class FrontControllerTest extends TestCase
         $controller = new FrontController($dispatcher, $twig, $translator, new Logger('test', [$handler]));
         $_GET = [];
         $_POST = [];
-        $_SESSION = [];
 
         ob_start();
         $controller->handle(['REQUEST_URI' => $path, 'REQUEST_METHOD' => 'GET']);
@@ -94,14 +96,14 @@ final class FrontControllerTest extends TestCase
             },
             true,
         );
-        $dispatcher = new Dispatcher(new Router([$route]), static fn(array $session): ?Response => null);
+        $sessionData = [];
+        $dispatcher = new Dispatcher(new Router([$route]), new AllowAllAuthorization(), new Session($sessionData));
         $twig = new Environment(new ArrayLoader(['error.html.twig' => '{{ message }}']));
         $translator = $this->createStub(TranslatorInterface::class);
         $handler = new TestHandler();
         $controller = new FrontController($dispatcher, $twig, $translator, new Logger('test', [$handler]));
         $_GET = [];
         $_POST = [];
-        $_SESSION = [];
 
         ob_start();
         $controller->handle(['REQUEST_URI' => $path, 'REQUEST_METHOD' => 'GET']);
@@ -132,14 +134,14 @@ final class FrontControllerTest extends TestCase
             },
             true,
         );
-        $dispatcher = new Dispatcher(new Router([$route]), static fn(array $session): ?Response => null);
+        $sessionData = [];
+        $dispatcher = new Dispatcher(new Router([$route]), new AllowAllAuthorization(), new Session($sessionData));
         $twig = new Environment(new ArrayLoader(['error.html.twig' => '{{ message }}']));
         $translator = $this->createStub(TranslatorInterface::class);
         $handler = new TestHandler();
         $controller = new FrontController($dispatcher, $twig, $translator, new Logger('test', [$handler]));
         $_GET = [];
         $_POST = [];
-        $_SESSION = [];
 
         ob_start();
         $controller->handle(['REQUEST_URI' => $path, 'REQUEST_METHOD' => 'GET']);
@@ -148,5 +150,13 @@ final class FrontControllerTest extends TestCase
         self::assertSame(429, http_response_code());
         self::assertSame($expectedBody, $body);
         self::assertTrue($handler->hasWarningThatContains('External API rate limit exceeded during HTTP request.'));
+    }
+}
+
+final class AllowAllAuthorization implements RequestAuthorization
+{
+    public function requireAuthenticated(): ?Response
+    {
+        return null;
     }
 }

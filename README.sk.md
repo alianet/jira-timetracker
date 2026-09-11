@@ -79,6 +79,33 @@ docker compose exec php composer --version
 docker compose exec php composer install
 ```
 
+## Cache kontajnera
+
+Pri `LOG_LEVEL=debug` používa každá požiadavka kontrolu zdrojov Symfony `ConfigCache`.
+Zmeny súboru `config/services.php`, PHP súborov v `src/` alebo triedy
+`ContainerFactory` automaticky zneplatnia a znovu zostavia skompilovanú cache kontajnera.
+
+V produkcii požiadavky iba načítavajú vopred zostavenú cache a nikdy neprehľadávajú
+zdrojové súbory. Composer ju automaticky zahreje po `install` a `update` pomocou
+skriptov `post-install-cmd` a `post-update-cmd`. Ak nasadenie znova neinštaluje
+závislosti alebo spúšťa Composer s `--no-scripts`, zahrejte cache explicitne po
+nasadení nového kódu, skôr než na novú verziu presmerujete prevádzku:
+
+```bash
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Zahriatie atomicky nahradí cache kontajnera, takže bežné nasadenie nevyžaduje
+predchádzajúce čistenie. Ak je pri zastavenej aplikácii potrebné čisté zostavenie,
+odstráňte iba vygenerované súbory a zahriatie spustite znova:
+
+```bash
+rm -f var/cache/container/AppContainer.php var/cache/container/AppContainer.php.meta var/cache/container/AppContainer.php.meta.json
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Neodstraňujte celý adresár `var/cache`.
+
 Aplikácia je modulárny monolit orientovaný na DDD s obchodnými modulmi `Identity`,
 `Reporting` a `TimeTracking`. `Shared` je malé zdieľané doménové jadro a technické
 záležitosti hostiteľa aplikácie sú v `Kernel`. Kontroléry sú vo vrstve `Presentation`

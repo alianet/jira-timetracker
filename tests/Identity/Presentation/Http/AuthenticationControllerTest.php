@@ -18,6 +18,7 @@ use App\Identity\Presentation\Http\AuthenticationController;
 use App\Identity\Presentation\Http\SessionSecurity;
 use App\Kernel\Exception\ApplicationRuntimeException as WorkLogRuntimeException;
 use App\Kernel\Presentation\Http\Request;
+use App\Kernel\Session\Session;
 use PHPUnit\Framework\TestCase;
 
 final class AuthenticationControllerTest extends TestCase
@@ -26,8 +27,9 @@ final class AuthenticationControllerTest extends TestCase
     {
         $gateway = new StubAuthorizationGateway(true);
         $security = new StubSessionSecurity();
-        $controller = $this->controller($gateway, $security);
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
+        $controller = $this->controller($gateway, $security, $session);
 
         $login = $controller->login(new Request('GET', '/login', [], [], [], $session));
         self::assertSame(302, $login->status);
@@ -39,9 +41,9 @@ final class AuthenticationControllerTest extends TestCase
 
         self::assertSame(303, $callback->status);
         self::assertSame('/', $callback->headers['Location']);
-        self::assertArrayNotHasKey('oauth_state', $session);
-        self::assertSame('csrf-token', $session['csrf_token']);
-        self::assertArrayHasKey('atlassian', $session);
+        self::assertArrayNotHasKey('oauth_state', $sessionData);
+        self::assertSame('csrf-token', $sessionData['csrf_token']);
+        self::assertArrayHasKey('atlassian', $sessionData);
         self::assertSame(1, $security->regenerations);
     }
 
@@ -51,23 +53,25 @@ final class AuthenticationControllerTest extends TestCase
             [['state' => 'state-token', 'error' => 'access_denied'], 'Logowanie Atlassian zostało anulowane lub odrzucone.'],
             [['state' => 'state-token'], 'Atlassian nie zwrócił kodu autoryzacyjnego.'],
         ] as [$query, $message]) {
-            $session = ['oauth_state' => 'state-token'];
+            $sessionData = ['oauth_state' => 'state-token'];
+            $session = new Session($sessionData);
             try {
-                $this->controller(new StubAuthorizationGateway(true), new StubSessionSecurity())
+                $this->controller(new StubAuthorizationGateway(true), new StubSessionSecurity(), $session)
                     ->callback(new Request('GET', '/oauth/callback', $query, [], [], $session));
                 self::fail('Expected callback error.');
             } catch (WorkLogRuntimeException $exception) {
                 self::assertSame($message, $exception->getMessage());
             }
-            self::assertArrayNotHasKey('atlassian', $session);
-            self::assertArrayNotHasKey('oauth_state', $session);
+            self::assertArrayNotHasKey('atlassian', $sessionData);
+            self::assertArrayNotHasKey('oauth_state', $sessionData);
         }
     }
 
     public function testIndividualModeSkipsOAuthAndKeepsRedirectContract(): void
     {
-        $controller = $this->controller(new StubAuthorizationGateway(false), new StubSessionSecurity());
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
+        $controller = $this->controller(new StubAuthorizationGateway(false), new StubSessionSecurity(), $session);
         self::assertSame(302, $controller->login(new Request('GET', '/login', [], [], [], $session))->status);
         self::assertSame(302, $controller->callback(new Request('GET', '/oauth/callback', [], [], [], $session))->status);
     }
@@ -75,8 +79,9 @@ final class AuthenticationControllerTest extends TestCase
     public function testLogoutRejectsInvalidCsrfAndClearsWholeSessionOnSuccess(): void
     {
         $security = new StubSessionSecurity();
-        $controller = $this->controller(new StubAuthorizationGateway(true), $security);
-        $session = ['csrf_token' => 'known', 'atlassian' => ['access_token' => 'secret'], 'locale' => 'pl'];
+        $sessionData = ['csrf_token' => 'known', 'atlassian' => ['access_token' => 'secret'], 'locale' => 'pl'];
+        $session = new Session($sessionData);
+        $controller = $this->controller(new StubAuthorizationGateway(true), $security, $session);
 
         try {
             $controller->logout(new Request('POST', '/logout', [], ['csrf_token' => 'wrong'], [], $session));
@@ -84,29 +89,28 @@ final class AuthenticationControllerTest extends TestCase
         } catch (WorkLogRuntimeException $exception) {
             self::assertSame('Nieprawidłowy token wylogowania.', $exception->getMessage());
         }
-        self::assertNotSame([], $session);
+        self::assertNotSame([], $sessionData);
 
         $response = $controller->logout(new Request('POST', '/logout', [], ['csrf_token' => 'known'], [], $session));
         self::assertSame(303, $response->status);
-        self::assertSame([], $session);
+        self::assertSame([], $sessionData);
         self::assertSame(1, $security->regenerations);
     }
 
-    private function controller(AuthorizationGateway $gateway, SessionSecurity $security): AuthenticationController
+    private function controller(AuthorizationGateway $gateway, SessionSecurity $security, Session $session): AuthenticationController
     {
         return new AuthenticationController(
-            static fn(array &$session): StartAuthorizationHandler => new StartAuthorizationHandler($gateway),
-            fn(array &$session): CompleteAuthorizationHandler => new CompleteAuthorizationHandler(
+            static fn(): StartAuthorizationHandler => new StartAuthorizationHandler($gateway),
+            fn(): CompleteAuthorizationHandler => new CompleteAuthorizationHandler(
                 $gateway,
                 $this->tokenStore($session),
             ),
-            fn(array &$session): LogoutHandler => new LogoutHandler($this->tokenStore($session)),
+            fn(): LogoutHandler => new LogoutHandler($this->tokenStore($session)),
             $security,
         );
     }
 
-    /** @param array<array-key, mixed> $session */
-    private function tokenStore(array &$session): SessionAccessTokenStore
+    private function tokenStore(Session $session): SessionAccessTokenStore
     {
         return new SessionAccessTokenStore(
             $session,

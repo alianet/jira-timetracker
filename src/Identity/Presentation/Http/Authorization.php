@@ -10,26 +10,25 @@ namespace App\Identity\Presentation\Http;
 use App\Identity\Application\Authentication\AccountType;
 use App\Identity\Application\Authentication\Connection;
 use App\Kernel\Exception\ApplicationRuntimeException;
+use App\Kernel\Presentation\Http\RequestAuthorization;
 use App\Kernel\Presentation\Http\Response;
 use Twig\Environment;
 
-final readonly class Authorization
+final readonly class Authorization implements RequestAuthorization
 {
     public function __construct(
-        /** @var \Closure(array<array-key, mixed>): Connection */
+        /** @var \Closure(): Connection */
         private \Closure $connection,
         private Environment $twig,
         private AccountType $accountType,
     ) {}
 
     /**
-     * The session is passed by reference: resolving a connection can refresh and persist rotated OAuth tokens.
-     *
-     * @param array<array-key, mixed> $session
+     * Resolving a connection can refresh and persist rotated OAuth tokens in the request-scoped session.
      */
-    public function requireAuthenticated(array &$session): ?Response
+    public function requireAuthenticated(): ?Response
     {
-        $connection = ($this->connection)($session);
+        $connection = ($this->connection)();
         if ($connection->authenticated) {
             return null;
         }

@@ -20,9 +20,9 @@ use Psr\Log\NullLogger;
 final readonly class AuthenticationController
 {
     /**
-     * @param \Closure(array<array-key, mixed>&): StartAuthorizationHandler $start
-     * @param \Closure(array<array-key, mixed>&): CompleteAuthorizationHandler $complete
-     * @param \Closure(array<array-key, mixed>&): LogoutHandler $logout
+     * @param \Closure(): StartAuthorizationHandler $start
+     * @param \Closure(): CompleteAuthorizationHandler $complete
+     * @param \Closure(): LogoutHandler $logout
      */
     public function __construct(
         private \Closure $start,
@@ -36,25 +36,25 @@ final readonly class AuthenticationController
     {
         $this->logger->info('User started Atlassian authentication.');
         $state = $this->security->randomToken();
-        $url = ($this->start)($request->session)->handle($state);
+        $url = ($this->start)()->handle($state);
         if ($url === null) {
             $this->logger->debug('OAuth login skipped for non-interactive authentication mode.');
             return Response::redirect('/', 302);
         }
-        $request->session['oauth_state'] = $state;
+        $request->session->set('oauth_state', $state);
 
         return Response::redirect($url, 302);
     }
 
     public function callback(Request $request): Response
     {
-        $handler = ($this->complete)($request->session);
+        $handler = ($this->complete)();
         if (!$handler->isInteractive()) {
             $this->logger->debug('OAuth callback skipped for non-interactive authentication mode.');
             return Response::redirect('/', 302);
         }
-        $expectedState = ApiValue::stringValue($request->session['oauth_state'] ?? null);
-        unset($request->session['oauth_state']);
+        $expectedState = ApiValue::stringValue($request->session->get('oauth_state'));
+        $request->session->remove('oauth_state');
         $handler->handle(
             $expectedState,
             ApiValue::stringValue($request->query['state'] ?? null),
@@ -62,7 +62,7 @@ final readonly class AuthenticationController
             ApiValue::stringValue($request->query['code'] ?? null),
         );
         $this->security->regenerateId();
-        $request->session['csrf_token'] = $this->security->randomToken();
+        $request->session->set('csrf_token', $this->security->randomToken());
         $this->logger->info('User completed Atlassian authentication.');
 
         return Response::redirect('/');
@@ -71,14 +71,14 @@ final readonly class AuthenticationController
     public function logout(Request $request): Response
     {
         if (!hash_equals(
-            ApiValue::stringValue($request->session['csrf_token'] ?? null),
+            ApiValue::stringValue($request->session->get('csrf_token')),
             ApiValue::stringValue($request->post['csrf_token'] ?? null),
         )) {
             $this->logger->warning('Logout rejected because of invalid CSRF token.');
             throw WorkLogRuntimeException::create('Nieprawidłowy token wylogowania.');
         }
-        ($this->logout)($request->session)->handle();
-        $request->session = [];
+        ($this->logout)()->handle();
+        $request->session->clear();
         $this->security->regenerateId();
         $this->logger->info('User logged out.');
 

@@ -17,14 +17,15 @@ use App\Reporting\Domain\ReportTimeZone;
 use App\Reporting\Domain\WorklogAuthorId;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportCsvController
 {
-    /** @param callable(array<array-key, mixed>&): ExportMonthlyReportHandler $exportReport */
+    /** @param callable(): ExportMonthlyReportHandler $exportReport */
     public function __construct(
         private mixed $exportReport,
         private bool $enabled,
-        private string $disabledMessage,
+        private TranslatorInterface $translator,
         private ReportTimeZone $timezone,
         private LoggerInterface $logger = new NullLogger(),
     ) {}
@@ -33,12 +34,12 @@ final readonly class ReportCsvController
     {
         if (!$this->enabled) {
             $this->logger->warning('CSV report export rejected because the feature is disabled.');
-            throw WorkLogRuntimeException::create($this->disabledMessage);
+            throw WorkLogRuntimeException::create($this->translator->trans('csv.export_disabled'));
         }
         $query = ApiValue::stringMap($request->query);
         $reportQuery = ReportQuery::fromQuery($query);
         $authorId = trim($query['accountId'] ?? '') === '' ? null : WorklogAuthorId::fromString($query['accountId']);
-        $file = ($this->exportReport)($request->session)->handle(
+        $file = ($this->exportReport)()->handle(
             new ReportPeriod($reportQuery->year, $reportQuery->month, $this->timezone),
             $authorId,
         );

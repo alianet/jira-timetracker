@@ -9,30 +9,30 @@ namespace App\Identity\Infrastructure\Session;
 
 use App\Identity\Application\Authentication\AccessTokenStore;
 use App\Identity\Application\Authentication\AuthenticatedAccess;
+use App\Kernel\Session\Session;
 use App\Kernel\Support\ApiValue;
 
 final class SessionAccessTokenStore implements AccessTokenStore
 {
-    /** @param array<array-key, mixed> $session */
     public function __construct(
-        private array &$session,
+        private readonly Session $session,
         private readonly ?SessionTokenCipher $cipher,
     ) {}
 
     public function load(): ?AuthenticatedAccess
     {
         if ($this->cipher === null) {
-            unset($this->session['atlassian']);
+            $this->session->remove('atlassian');
 
             return null;
         }
 
-        $encrypted = ApiValue::stringValue($this->session['atlassian'] ?? null);
+        $encrypted = ApiValue::stringValue($this->session->get('atlassian'));
         $value = $this->cipher->decrypt($encrypted);
         $token = ApiValue::stringValue($value['access_token'] ?? null);
         $cloudId = ApiValue::stringValue($value['cloud_id'] ?? null);
         if ($token === '' || $cloudId === '') {
-            unset($this->session['atlassian']);
+            $this->session->remove('atlassian');
 
             return null;
         }
@@ -53,18 +53,18 @@ final class SessionAccessTokenStore implements AccessTokenStore
             throw new \LogicException('Magazyn tokenów OAuth jest wyłączony w trybie individual.');
         }
 
-        $this->session['atlassian'] = $this->cipher->encrypt([
+        $this->session->set('atlassian', $this->cipher->encrypt([
             'access_token' => $access->accessToken,
             'refresh_token' => $access->refreshToken,
             'expires_at' => $access->expiresAt,
             'cloud_id' => $access->cloudId,
             'site_url' => $access->siteUrl,
             'site_name' => $access->siteName,
-        ]);
+        ]));
     }
 
     public function clear(): void
     {
-        unset($this->session['atlassian']);
+        $this->session->remove('atlassian');
     }
 }

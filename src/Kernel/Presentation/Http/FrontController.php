@@ -45,7 +45,7 @@ final readonly class FrontController
         ]);
 
         try {
-            $response = $this->dispatcher->dispatch($method, $path, $_GET, $_POST, $_SESSION);
+            $response = $this->dispatcher->dispatch($method, $path, $_GET, $_POST);
             http_response_code($response->status);
             foreach ($response->headers as $name => $value) {
                 header($name . ': ' . $value);

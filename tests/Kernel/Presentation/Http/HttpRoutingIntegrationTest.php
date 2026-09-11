@@ -17,6 +17,7 @@ use App\Kernel\Presentation\Http\Request;
 use App\Kernel\Presentation\Http\Response;
 use App\Kernel\Presentation\Http\Route;
 use App\Kernel\Presentation\Http\Router;
+use App\Kernel\Session\Session;
 use App\TimeTracking\Application\Handler\AddWorklogHandler;
 use App\TimeTracking\Application\Handler\DeleteWorklogHandler;
 use App\TimeTracking\Application\Handler\UpdateWorklogHandler;
@@ -70,7 +71,8 @@ final class HttpRoutingIntegrationTest extends TestCase
     {
         $gateway = new RecordingWorklogGateway();
         $controller = $this->worklogs($gateway);
-        $session = ['csrf_token' => 'known'];
+        $sessionData = ['csrf_token' => 'known'];
+        $session = new Session($sessionData);
         $request = new Request('POST', '/worklogs', [], [
             'csrf_token' => 'known', 'issue' => ' app-7 ', 'date' => '2026-08-31',
             'time_spent' => '1h 30m', 'comment' => 'done',
@@ -89,7 +91,8 @@ final class HttpRoutingIntegrationTest extends TestCase
     {
         $gateway = new RecordingWorklogGateway();
         $controller = $this->worklogs($gateway);
-        $session = ['csrf_token' => 'known'];
+        $sessionData = ['csrf_token' => 'known'];
+        $session = new Session($sessionData);
         $common = ['csrf_token' => 'known', 'issue' => 'APP-7', 'date' => '2026-08-31'];
 
         $updated = $controller->update(new Request('POST', '/worklogs/42', [], $common + [
@@ -107,7 +110,8 @@ final class HttpRoutingIntegrationTest extends TestCase
     {
         $gateway = new RecordingWorklogGateway();
         $controller = $this->worklogs($gateway);
-        $session = ['csrf_token' => 'known'];
+        $sessionData = ['csrf_token' => 'known'];
+        $session = new Session($sessionData);
 
         try {
             $controller->create(new Request('POST', '/worklogs', [], ['csrf_token' => 'wrong'], [], $session));
@@ -123,7 +127,8 @@ final class HttpRoutingIntegrationTest extends TestCase
     {
         $gateway = new RecordingWorklogGateway();
         $controller = $this->worklogs($gateway);
-        $session = ['csrf_token' => 'known'];
+        $sessionData = ['csrf_token' => 'known'];
+        $session = new Session($sessionData);
         $response = $controller->legacy(new Request('POST', '/', [], [
             'csrf_token' => 'known', 'issue' => 'APP-7', 'date' => '2026-08-31',
             'time_spent' => '1h', 'comment' => '', 'action' => 'save', 'worklog_id' => '',
@@ -149,12 +154,13 @@ final class HttpRoutingIntegrationTest extends TestCase
     public function testLoginRouteStaysPublicAndPrivateRoutesReturnSuitableLoginResponses(): void
     {
         $authorization = $this->authorization(AuthenticationMode::InteractiveOAuth, AccountType::Company);
-        $dispatcher = new Dispatcher($this->router(), $authorization->requireAuthenticated(...));
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
+        $dispatcher = new Dispatcher($this->router(), $authorization, $session);
 
-        $publicResponse = $dispatcher->dispatch('GET', '/login', [], [], $session);
-        $privateResponse = $dispatcher->dispatch('GET', '/', [], [], $session);
-        $apiResponse = $dispatcher->dispatch('GET', '/api/issues/search', [], [], $session);
+        $publicResponse = $dispatcher->dispatch('GET', '/login', [], []);
+        $privateResponse = $dispatcher->dispatch('GET', '/', [], []);
+        $apiResponse = $dispatcher->dispatch('GET', '/api/issues/search', [], []);
 
         self::assertSame(200, $publicResponse->status);
         self::assertSame(401, $privateResponse->status);
@@ -167,13 +173,14 @@ final class HttpRoutingIntegrationTest extends TestCase
     public function testIndividualModeKeepsMissingTokenError(): void
     {
         $authorization = $this->authorization(AuthenticationMode::PersonalToken, AccountType::Individual);
-        $dispatcher = new Dispatcher($this->router(), $authorization->requireAuthenticated(...));
-        $session = [];
+        $sessionData = [];
+        $session = new Session($sessionData);
+        $dispatcher = new Dispatcher($this->router(), $authorization, $session);
 
         $this->expectException(WorkLogRuntimeException::class);
         $this->expectExceptionMessage('Tryb individual wymaga skonfigurowanego tokenu API Atlassian.');
 
-        $dispatcher->dispatch('GET', '/', [], [], $session);
+        $dispatcher->dispatch('GET', '/', [], []);
     }
 
     private function router(): Router
@@ -198,7 +205,7 @@ final class HttpRoutingIntegrationTest extends TestCase
     private function authorization(AuthenticationMode $mode, AccountType $accountType): Authorization
     {
         return new Authorization(
-            static fn(array &$session): Connection => Connection::unauthenticated($mode, 'https://jira.example'),
+            static fn(): Connection => Connection::unauthenticated($mode, 'https://jira.example'),
             new Environment(new ArrayLoader(['auth/login.html.twig' => 'login {{ accountType }}'])),
             $accountType,
         );
@@ -207,9 +214,9 @@ final class HttpRoutingIntegrationTest extends TestCase
     private function worklogs(WorklogGateway $gateway): WorklogController
     {
         return new WorklogController(
-            static fn(array &$session): AddWorklogHandler => new AddWorklogHandler($gateway, JiraTimeFormat::units()),
-            static fn(array &$session): UpdateWorklogHandler => new UpdateWorklogHandler($gateway, JiraTimeFormat::units()),
-            static fn(array &$session): DeleteWorklogHandler => new DeleteWorklogHandler($gateway),
+            static fn(): AddWorklogHandler => new AddWorklogHandler($gateway, JiraTimeFormat::units()),
+            static fn(): UpdateWorklogHandler => new UpdateWorklogHandler($gateway, JiraTimeFormat::units()),
+            static fn(): DeleteWorklogHandler => new DeleteWorklogHandler($gateway),
         );
     }
 }

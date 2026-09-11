@@ -16,7 +16,7 @@ final class LayerDependenciesTest extends TestCase
 
     public function testLegacyTopLevelCataloguesAreGone(): void
     {
-        $allowed = ['Identity', 'Kernel', 'Reporting', 'Shared', 'TimeTracking'];
+        $allowed = ['Composition', 'Identity', 'Kernel', 'Reporting', 'Shared', 'TimeTracking'];
         $directories = glob($this->root() . '/src/*', GLOB_ONLYDIR) ?: [];
 
         foreach ($directories as $directory) {

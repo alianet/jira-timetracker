@@ -81,6 +81,36 @@ docker compose exec php composer --version
 docker compose exec php composer install
 ```
 
+## Container-Cache
+
+Bei `LOG_LEVEL=debug` prüft Symfony `ConfigCache` bei jeder Anfrage die Ressourcen.
+Änderungen an `config/services.php`, an PHP-Dateien unter `src/` oder an
+`ContainerFactory` invalidieren den kompilierten Container-Cache und bauen ihn
+automatisch neu auf.
+
+In der Produktion laden Anfragen ausschließlich den vorbereiteten Cache und durchsuchen
+niemals die Quelldateien. Composer wärmt ihn nach `install` und `update` über die Skripte
+`post-install-cmd` und `post-update-cmd` automatisch auf. Wenn ein Deployment die
+Abhängigkeiten nicht erneut installiert oder Composer mit `--no-scripts` ausführt,
+wärmen Sie den Cache nach dem Deployment des neuen Codes explizit auf, bevor Sie den
+Datenverkehr auf das Release leiten:
+
+```bash
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Das Aufwärmen ersetzt den Container-Cache atomar, daher ist bei regulären Deployments
+keine vorherige Bereinigung erforderlich. Falls bei gestoppter Anwendung ein sauberer
+Neuaufbau nötig ist, entfernen Sie ausschließlich die generierten Artefakte und führen
+Sie das Aufwärmen erneut aus:
+
+```bash
+rm -f var/cache/container/AppContainer.php var/cache/container/AppContainer.php.meta var/cache/container/AppContainer.php.meta.json
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Entfernen Sie nicht das gesamte Verzeichnis `var/cache`.
+
 Die Anwendung ist ein DDD-orientierter modularer Monolith mit `Identity`, `Reporting`
 und `TimeTracking` als Geschäftsmodulen. `Shared` ist ein kleiner gemeinsam genutzter
 Domain-Kernel, technische Belange des Anwendungshosts liegen in `Kernel`. Controller

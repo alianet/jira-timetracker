@@ -6,3 +6,4 @@ vendor/
 .php-cs-fixer.cache
 .deptrac.cache
 var/log/*.log
+var/cache/

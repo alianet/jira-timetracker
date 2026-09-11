@@ -29,8 +29,8 @@ use Twig\Error\SyntaxError;
 final readonly class ReportPageController
 {
     /**
-     * @param callable(array<array-key, mixed>&): GenerateMonthlyReportHandler $generateReport
-     * @param callable(array<array-key, mixed>&): ReportViewFactory $viewFactory
+     * @param callable(): GenerateMonthlyReportHandler $generateReport
+     * @param callable(): ReportViewFactory $viewFactory
      */
     public function __construct(
         private Environment $twig,
@@ -52,7 +52,7 @@ final readonly class ReportPageController
         $query = ApiValue::stringMap($request->query);
         $reportQuery = ReportQuery::fromQuery($query);
         $authorId = trim($query['accountId'] ?? '') === '' ? null : WorklogAuthorId::fromString($query['accountId']);
-        $generated = ($this->generateReport)($request->session)->handle(
+        $generated = ($this->generateReport)()->handle(
             new ReportPeriod($reportQuery->year, $reportQuery->month, $this->timezone),
             $authorId,
         );
@@ -62,14 +62,14 @@ final readonly class ReportPageController
             'selected_author' => $authorId !== null,
             'worklog_count' => count($generated->report->entries),
         ]);
-        $site = ApiValue::object($request->session['atlassian'] ?? null);
+        $site = ApiValue::object($request->session->get('atlassian'));
         $pageContext = new ReportPageContext(
             siteName: ApiValue::stringValue($site['site_name'] ?? null),
             siteUrl: ApiValue::stringValue($site['site_url'] ?? null),
-            csrfToken: ApiValue::stringValue($request->session['csrf_token'] ?? null),
+            csrfToken: ApiValue::stringValue($request->session->get('csrf_token')),
             exportEnabled: $this->exportEnabled,
         );
-        $view = ($this->viewFactory)($request->session)->create($generated->report, new ReportViewContext(
+        $view = ($this->viewFactory)()->create($generated->report, new ReportViewContext(
             accountId: $generated->accountId,
             displayName: $generated->displayName,
             avatarUrl: $generated->avatarUrl,

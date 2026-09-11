@@ -79,6 +79,33 @@ docker compose exec php composer --version
 docker compose exec php composer install
 ```
 
+## Container cache
+
+With `LOG_LEVEL=debug`, each request uses Symfony `ConfigCache` resource checks.
+Changes to `config/services.php`, PHP files under `src/`, or `ContainerFactory`
+invalidate and rebuild the compiled container cache automatically.
+
+In production, requests only load the prebuilt cache and never scan source files.
+Composer automatically warms it up after `install` and `update` via the
+`post-install-cmd` and `post-update-cmd` scripts. If a deployment does not reinstall
+dependencies or runs Composer with `--no-scripts`, warm it up explicitly after
+deploying the new code and before directing traffic to the release:
+
+```bash
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+The warmup atomically replaces the container cache, so routine deployments do not
+need a preceding cleanup. If a clean rebuild is required while the application is
+stopped, remove only its generated artifacts and run the warmup again:
+
+```bash
+rm -f var/cache/container/AppContainer.php var/cache/container/AppContainer.php.meta var/cache/container/AppContainer.php.meta.json
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Do not remove the whole `var/cache` directory.
+
 The app is a DDD-oriented modular monolith with `Identity`, `Reporting`, and
 `TimeTracking` as business modules. `Shared` is a small domain shared kernel,
 while technical application-host concerns live in `Kernel`. Controllers live in each module's `Presentation`,

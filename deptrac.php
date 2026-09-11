@@ -32,8 +32,11 @@ return static function (DeptracConfig $config): void {
     $kernelException = $layer('Kernel Exception', 'Kernel\\Exception');
     $kernelInfrastructure = $layer('Kernel Infrastructure', 'Kernel\\Infrastructure');
     $kernelPresentation = $layer('Kernel Presentation', 'Kernel\\Presentation');
+    $kernelSession = $layer('Kernel Session', 'Kernel\\Session');
     $kernelSupport = $layer('Kernel Support', 'Kernel\\Support');
-    $bootstrap = Layer::withName('Composition Root')->collectors(ClassLikeConfig::create('^App.Bootstrap$'));
+    $bootstrap = Layer::withName('Composition Root')->collectors(
+        ClassLikeConfig::create('^App.(Bootstrap$|Composition.)'),
+    );
 
     $config
         ->paths('./src')
@@ -56,6 +59,7 @@ return static function (DeptracConfig $config): void {
             $kernelException,
             $kernelInfrastructure,
             $kernelPresentation,
+            $kernelSession,
             $kernelSupport,
             $bootstrap,
         )
@@ -68,6 +72,7 @@ return static function (DeptracConfig $config): void {
                 $identityPresentation,
                 $kernelConfig,
                 $kernelException,
+                $kernelSession,
                 $kernelSupport,
                 $sharedInfrastructure,
             ),
@@ -75,6 +80,7 @@ return static function (DeptracConfig $config): void {
                 $identityApplication,
                 $kernelException,
                 $kernelPresentation,
+                $kernelSession,
                 $kernelSupport,
             ),
             Ruleset::forLayer($reportingDomain)->accesses($sharedDomain),
@@ -92,6 +98,7 @@ return static function (DeptracConfig $config): void {
                 $reportingApplication,
                 $kernelException,
                 $kernelPresentation,
+                $kernelSession,
                 $kernelSupport,
             ),
             Ruleset::forLayer($timeTrackingDomain),
@@ -111,6 +118,7 @@ return static function (DeptracConfig $config): void {
                 $timeTrackingApplication,
                 $kernelException,
                 $kernelPresentation,
+                $kernelSession,
                 $kernelSupport,
             ),
             Ruleset::forLayer($sharedDomain),
@@ -121,8 +129,10 @@ return static function (DeptracConfig $config): void {
             Ruleset::forLayer($kernelPresentation)->accesses(
                 $kernelConfig,
                 $kernelException,
+                $kernelSession,
                 $kernelSupport,
             ),
+            Ruleset::forLayer($kernelSession),
             Ruleset::forLayer($kernelSupport),
             Ruleset::forLayer($bootstrap)->accesses(
                 $identityApplication,
@@ -136,10 +146,12 @@ return static function (DeptracConfig $config): void {
                 $timeTrackingDomain,
                 $timeTrackingInfrastructure,
                 $timeTrackingPresentation,
+                $sharedDomain,
                 $sharedInfrastructure,
                 $kernelConfig,
                 $kernelInfrastructure,
                 $kernelPresentation,
+                $kernelSession,
             ),
         )
     ;

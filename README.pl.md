@@ -81,6 +81,33 @@ docker compose exec php composer --version
 docker compose exec php composer install
 ```
 
+## Cache kontenera
+
+Przy `LOG_LEVEL=debug` każde żądanie używa kontroli zasobów Symfony `ConfigCache`.
+Zmiana `config/services.php`, plików PHP w `src/` albo klasy `ContainerFactory`
+automatycznie unieważnia i przebudowuje skompilowany cache kontenera.
+
+W produkcji żądania wyłącznie ładują przygotowany cache i nigdy nie skanują plików
+źródłowych. Composer automatycznie wykonuje warmup po `install` i `update` za pomocą
+skryptów `post-install-cmd` i `post-update-cmd`. Jeśli wdrożenie nie instaluje ponownie
+zależności albo uruchamia Composer z `--no-scripts`, wykonaj jawny warmup po wdrożeniu
+nowego kodu, zanim skierujesz ruch do nowej wersji:
+
+```bash
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Warmup atomowo zastępuje cache kontenera, więc zwykłe wdrożenie nie wymaga
+wcześniejszego czyszczenia. Jeśli przy zatrzymanej aplikacji potrzebna jest pełna
+przebudowa, usuń wyłącznie wygenerowane pliki kontenera i ponownie wykonaj warmup:
+
+```bash
+rm -f var/cache/container/AppContainer.php var/cache/container/AppContainer.php.meta var/cache/container/AppContainer.php.meta.json
+docker compose exec --user www-data php composer cache:container:warmup
+```
+
+Nie usuwaj całego katalogu `var/cache`.
+
 Kod aplikacji jest modularnym monolitem DDD podzielonym na moduły biznesowe
 `Identity`, `Reporting` i `TimeTracking`. `Shared` zawiera mały współdzielony
 kernel domenowy, a techniczna powłoka aplikacji znajduje się w `Kernel`.

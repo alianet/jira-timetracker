@@ -28,6 +28,7 @@ return (new Config())
         (new Finder())
             // 💡 root folder to check
             ->in(__DIR__)
+            ->exclude(['var/cache'])
     // 💡 additional files, eg bin entry file
     // ->append([__DIR__.'/bin-entry-file'])
     // 💡 folders to exclude, if any

@@ -10,6 +10,7 @@ namespace Tests\Identity\Infrastructure\Session;
 use App\Identity\Application\Authentication\AuthenticatedAccess;
 use App\Identity\Infrastructure\Session\SessionAccessTokenStore;
 use App\Identity\Infrastructure\Session\SessionTokenCipher;
+use App\Kernel\Session\Session;
 use PHPUnit\Framework\TestCase;
 
 final class SessionAccessTokenStoreTest extends TestCase
@@ -57,9 +58,8 @@ final class SessionAccessTokenStoreTest extends TestCase
         self::assertArrayNotHasKey('atlassian', $session);
     }
 
-    /** @param array<array-key, mixed> $session */
     private function store(array &$session): SessionAccessTokenStore
     {
-        return new SessionAccessTokenStore($session, new SessionTokenCipher(self::KEY));
+        return new SessionAccessTokenStore(new Session($session), new SessionTokenCipher(self::KEY));
     }
 }

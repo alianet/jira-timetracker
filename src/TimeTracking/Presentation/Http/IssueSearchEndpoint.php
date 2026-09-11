@@ -12,12 +12,12 @@ use App\Kernel\Presentation\Http\Response;
 
 final readonly class IssueSearchEndpoint
 {
-    /** @param callable(array<array-key, mixed>&): SearchIssuesController $controller */
+    /** @param callable(): SearchIssuesController $controller */
     public function __construct(private mixed $controller) {}
 
     public function search(Request $request): Response
     {
-        $result = ($this->controller)($request->session)->search($request->query);
+        $result = ($this->controller)()->search($request->query);
 
         return Response::json($result->data);
     }

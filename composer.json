@@ -21,9 +21,11 @@
         "symfony/routing": "^8.1",
         "umulmrum/holiday": "dev-master#66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
         "symfony/dotenv": "^8.1",
+        "symfony/config": "^8.1",
         "symfony/translation": "^8.1",
         "monolog/monolog": "^3.8",
-        "alianet/env-sync": "^1.0"
+        "alianet/env-sync": "^1.0",
+        "symfony/dependency-injection": "^8.1"
     },
     "autoload": {
         "psr-4": {
@@ -49,13 +51,16 @@
         }
     },
     "scripts": {
+        "cache:container:warmup": "@php bin/cache-container-warmup.php",
         "env:check": "@php vendor/bin/env-sync diff",
         "env:update": "@php vendor/bin/env-sync update",
         "post-install-cmd": [
-            "@env:update"
+            "@env:update",
+            "@cache:container:warmup"
         ],
         "post-update-cmd": [
-            "@env:update"
+            "@env:update",
+            "@cache:container:warmup"
         ],
         "php:static": "php -d memory_limit=512M vendor/bin/phpstan analyse --no-progress",
         "php:unit": "phpunit",
