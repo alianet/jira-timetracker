@@ -186,6 +186,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SOUHRN","","Celkový pracovní čas:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 REPORT_TIME_FORMAT=human
+DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
@@ -195,6 +196,9 @@ LOG_LEVEL=error
 Hodnota `human` používá hodiny a minuty (`7h14m`), zatímco `decimal` zobrazuje
 desetinné hodiny zaokrouhlené na dvě desetinná místa (`7,25`). Výchozí hodnota je
 `human`.
+
+`DAILY_STATUSES` je čárkami oddělený seznam stavů Jiry, podle kterého dialog Daily
+načítá úkoly přiřazené aktuálnímu uživateli.
 
 `REPORT_EXPORT_ENABLED=false` skryje tlačítko stažení a zablokuje exportní endpoint.
 Pokud proměnná chybí nebo je nastavena na `false`, export zůstane vypnutý a ostatní

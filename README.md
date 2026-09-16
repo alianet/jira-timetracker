@@ -188,12 +188,16 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SUMMARY","","Work time total:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 REPORT_TIME_FORMAT=human
+DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` controls how durations are displayed on the report page.
+
+`DAILY_STATUSES` is a comma-separated list of Jira statuses used by the Daily
+dialog when loading issues assigned to the current user.
 Use `human` for the hours-and-minutes format (`7h14m`) or `decimal` for decimal
 hours rounded to two decimal places (`7,25`). The default value is `human`.
 

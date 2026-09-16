@@ -115,6 +115,27 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .matrix-table tfoot .total-column { z-index: 3; background: #e4e7ec; }
 .worklog-dialog { width: min(520px, calc(100% - 32px)); border: 0; border-radius: 16px; padding: 0; box-shadow: 0 24px 80px #1018284d; }
 .worklog-dialog::backdrop { background: #10182899; backdrop-filter: blur(2px); }
+.daily-dialog { width: min(1180px, calc(100% - 32px)); max-height: min(820px, calc(100dvh - 32px)); border: 0; border-radius: 16px; padding: 0; box-shadow: 0 24px 80px #1018284d; }
+.daily-dialog::backdrop { background: #10182899; backdrop-filter: blur(2px); }
+.daily-dialog-content { padding: 24px; }
+.daily-heading { margin-bottom: 18px; }
+.daily-heading h2 { margin: 5px 0 0; }
+.daily-status { margin: 0; padding: 30px 0; text-align: center; }
+.daily-status:empty { display: none; }
+.daily-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.daily-column { min-width: 0; padding: 16px; border: 1px solid #e4e7ec; border-radius: 12px; background: #f9fafb; }
+.daily-column-heading { display: flex; min-height: 52px; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.daily-column-heading h3 { margin: 4px 0 0; font-size: 1rem; }
+.daily-date, .daily-statuses { color: #475467; font-size: .75rem; font-weight: 700; text-align: right; }
+.daily-statuses { max-width: 48%; }
+.daily-list { display: grid; max-height: min(590px, calc(100dvh - 245px)); gap: 8px; overflow-y: auto; }
+.daily-issue { position: relative; padding: 13px 14px; border: 1px solid #eaecf0; border-radius: 10px; background: white; }
+.daily-issue-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.daily-issue h4 { margin: 7px 0 5px; color: #344054; font-size: .92rem; }
+.daily-issue p { display: -webkit-box; overflow: hidden; margin: 0; color: #667085; font-size: .8rem; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.daily-time { flex-shrink: 0; color: #175cd3; font-size: .8rem; }
+.daily-issue-status { display: inline-flex; margin-top: 9px; border-radius: 999px; padding: 3px 8px; color: #344054; background: #f2f4f7; font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+.daily-empty { padding: 35px 12px; text-align: center; }
 .worklog-form { display: grid; gap: 18px; padding: 24px; }
 .worklog-edit-only[hidden] { display: none; }
 .comment-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, .65fr); gap: 16px; align-items: start; }
@@ -184,6 +205,7 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .template-compact .weekday-short { margin-top: 2px; font-size: .58rem; }
 .template-compact .notice { flex: 0 0 auto; margin-bottom: 8px; padding: 8px 12px; }
 @media (max-width: 900px) { .overview-row { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .daily-columns { grid-template-columns: 1fr; } .daily-list { max-height: none; } }
 @media (max-width: 900px) { .template-compact .overview-row { grid-template-columns: 1fr; } }
 @media (max-width: 800px) { .top-navbar, .report-toolbar { align-items: stretch; flex-direction: column; gap: 10px; } .top-navbar { padding: 14px 16px; } .report-toolbar { padding: 12px 16px; } .account-bar { justify-content: space-between; } .filters { flex-wrap: wrap; } .container { margin-top: 16px; } .search-result { grid-template-columns: 90px 1fr; } .search-result b { display: none; } }
 @media (max-width: 800px) { .report-context { align-items: flex-start; flex-direction: column; gap: 8px; } .report-user { flex-wrap: wrap; } }

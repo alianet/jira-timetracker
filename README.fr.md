@@ -197,6 +197,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["RÉSUMÉ","","Temps de travail total :","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 REPORT_TIME_FORMAT=human
+DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
@@ -206,6 +207,9 @@ LOG_LEVEL=error
 La valeur `human` utilise les heures et minutes (`7h14m`), tandis que `decimal`
 affiche les heures décimales arrondies à deux décimales (`7,25`). La valeur par
 défaut est `human`.
+
+`DAILY_STATUSES` est une liste de statuts Jira séparés par des virgules. La fenêtre
+Daily l’utilise pour charger les tickets attribués à l’utilisateur actuel.
 
 `REPORT_EXPORT_ENABLED=false` masque le bouton de téléchargement et bloque l’endpoint
 d’export. Si cette variable est absente ou vaut `false`, l’export reste désactivé et

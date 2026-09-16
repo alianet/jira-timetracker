@@ -22,7 +22,7 @@
                     {% if not report.isOwnReport %}<a href="/?month={{ report.month }}&year={{ report.year }}">{{ t('report.show_my_time') }}</a>{% endif %}
                 </div>
             </div>
-            <form method="get" class="filters">
+            <form method="get" class="filters" id="report-period-form">
                 <input type="hidden" name="accountId" value="{{ report.accountId }}">
                 <label><span>{{ t('report.month') }}</span>
                     <select name="month">
@@ -47,7 +47,7 @@
                     <a class="period-navigation-button" href="/?accountId={{ report.accountId|url_encode }}&amp;month={{ report.nextMonth }}&amp;year={{ report.nextYear }}"
                        aria-label="{{ t('report.next_month') }}" title="{{ t('report.next_month') }}">&rarr;</a>
                 </nav>
-                <button type="submit">{{ t('report.show_report') }}</button>
+                <button type="button" id="daily-button" class="button-secondary">{{ t('daily.button') }}</button>
                 {% if report.exportEnabled %}
                     <button type="submit" class="button-secondary" formaction="/export.csv">{{ t('report.download_csv') }}</button>
                 {% endif %}

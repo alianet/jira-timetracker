@@ -50,10 +50,14 @@ use App\Shared\Infrastructure\SystemClock;
 use App\TimeTracking\Application\Handler\AddWorklogHandler;
 use App\TimeTracking\Application\Handler\DeleteWorklogHandler;
 use App\TimeTracking\Application\Handler\UpdateWorklogHandler;
+use App\TimeTracking\Application\Query\DailyOverviewDirectory;
 use App\TimeTracking\Domain\Model\WorkTimeUnits;
+use App\TimeTracking\Infrastructure\Jira\JiraDailyOverviewDirectory;
 use App\TimeTracking\Infrastructure\Jira\JiraIssueDirectory;
 use App\TimeTracking\Infrastructure\Jira\JiraTimeFormat;
 use App\TimeTracking\Infrastructure\Jira\JiraTransport;
+use App\TimeTracking\Presentation\Http\DailyOverviewController;
+use App\TimeTracking\Presentation\Http\DailyOverviewEndpoint;
 use App\TimeTracking\Presentation\Http\IssueSearchEndpoint;
 use App\TimeTracking\Presentation\Http\SearchIssuesController;
 use App\TimeTracking\Presentation\Http\WorklogController;
@@ -227,6 +231,9 @@ final class ContainerFactory
     {
         $container->autowire(JiraIssueDirectory::class)
             ->setFactory([self::class, 'jiraIssueDirectory']);
+        $container->autowire(JiraDailyOverviewDirectory::class)
+            ->setFactory([self::class, 'jiraDailyOverviewDirectory']);
+        $container->setAlias(DailyOverviewDirectory::class, JiraDailyOverviewDirectory::class);
     }
 
     private function registerPresentation(ContainerBuilder $container): void
@@ -250,6 +257,8 @@ final class ContainerFactory
             ->setArgument('$exportReport', $handler(ExportMonthlyReportHandler::class));
         $container->autowire(IssueSearchEndpoint::class)
             ->setArgument('$controller', $handler(SearchIssuesController::class));
+        $container->autowire(DailyOverviewEndpoint::class)
+            ->setArgument('$controller', $handler(DailyOverviewController::class));
         $container->autowire(UserSearchEndpoint::class)
             ->setArgument('$controller', $handler(SearchUsersController::class));
         $container->autowire(Authorization::class)
@@ -350,6 +359,23 @@ final class ContainerFactory
         return new JiraIssueDirectory($transport, $connection->siteUrl);
     }
 
+    public static function jiraDailyOverviewDirectory(
+        JiraTransport $transport,
+        Connection $connection,
+        Config $config,
+    ): JiraDailyOverviewDirectory {
+        $statuses = array_values(array_filter(array_map(
+            static fn(string $status): string => trim($status),
+            explode(',', $config->nullable('DAILY_STATUSES') ?? 'TO DO,IN PROGRESS'),
+        ), static fn(string $status): bool => $status !== ''));
+
+        return new JiraDailyOverviewDirectory(
+            $transport,
+            $connection->siteUrl,
+            $statuses === [] ? ['TO DO', 'IN PROGRESS'] : $statuses,
+        );
+    }
+
     public static function reportViewFactory(
         TranslatorInterface $translator,
         Connection $connection,
@@ -412,6 +438,7 @@ final class ContainerFactory
         ReportPageController $report,
         ReportCsvController $csv,
         IssueSearchEndpoint $issues,
+        DailyOverviewEndpoint $daily,
         UserSearchEndpoint $users,
     ): Router {
         return new Router([
@@ -419,6 +446,7 @@ final class ContainerFactory
             new Route('oauth_callback', '/oauth/callback', ['GET'], $authentication->callback(...), true),
             new Route('logout', '/logout', ['POST'], $authentication->logout(...), true),
             new Route('issues_search', '/api/issues/search', ['GET'], $issues->search(...)),
+            new Route('daily_overview', '/api/daily', ['GET'], $daily->show(...)),
             new Route('users_search', '/api/users/search', ['GET'], $users->search(...)),
             new Route('report_export', '/export.csv', ['GET'], $csv->export(...)),
             new Route('worklog_create', '/worklogs', ['POST'], $worklogs->create(...)),

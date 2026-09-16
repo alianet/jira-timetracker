@@ -166,6 +166,7 @@ final class LayerDependenciesTest extends TestCase
         yield 'holiday calendar' => [\App\Reporting\Infrastructure\Calendar\UmulmrumHolidayCalendar::class, \App\Reporting\Domain\Port\HolidayCalendar::class];
         yield 'worklog gateway' => [\App\TimeTracking\Infrastructure\Jira\JiraWorklogRepository::class, \App\TimeTracking\Application\Port\WorklogGateway::class];
         yield 'issue directory' => [\App\TimeTracking\Infrastructure\Jira\JiraIssueDirectory::class, \App\TimeTracking\Application\Query\IssueDirectory::class];
+        yield 'daily overview directory' => [\App\TimeTracking\Infrastructure\Jira\JiraDailyOverviewDirectory::class, \App\TimeTracking\Application\Query\DailyOverviewDirectory::class];
         yield 'user directory' => [\App\Identity\Infrastructure\Atlassian\AtlassianUserDirectory::class, \App\Identity\Application\Query\UserDirectory::class];
         yield 'OAuth gateway' => [\App\Identity\Infrastructure\Atlassian\AtlassianOAuth::class, \App\Identity\Application\Authentication\AuthorizationGateway::class];
         yield 'personal access gateway' => [\App\Identity\Infrastructure\Atlassian\AtlassianPersonalAccess::class, \App\Identity\Application\Authentication\AuthorizationGateway::class];

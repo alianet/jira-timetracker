@@ -1,0 +1,13 @@
+<?php
+
+// SPDX-FileCopyrightText: 2026 Mariusz Kaczanowski
+// SPDX-License-Identifier: MIT
+
+declare(strict_types=1);
+
+namespace App\TimeTracking\Application\Query;
+
+interface DailyOverviewDirectory
+{
+    public function get(): DailyOverview;
+}

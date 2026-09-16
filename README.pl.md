@@ -195,12 +195,16 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["PODSUMOWANIE","","Suma czasu pracy:","","{total_minutes}","{total_hours} godz. {total_remaining_minutes} min."]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 REPORT_TIME_FORMAT=human
+DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` określa sposób wyświetlania czasu na stronie raportu.
+
+`DAILY_STATUSES` to rozdzielona przecinkami lista statusów Jiry używana w oknie
+Daily do pobierania zadań przypisanych do bieżącego użytkownika.
 Wartość `human` używa zapisu godzin i minut (`7h14m`), a `decimal` godzin
 dziesiętnych zaokrąglonych do dwóch miejsc (`7,25`). Domyślna wartość to `human`.
 

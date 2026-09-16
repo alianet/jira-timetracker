@@ -1,0 +1,40 @@
+<dialog id="daily-dialog" class="daily-dialog"
+        data-loading="{{ t('daily.loading') }}"
+        data-load-failed="{{ t('daily.load_failed') }}"
+        data-no-description="{{ t('daily.no_description') }}"
+        data-no-time="{{ t('daily.no_time') }}">
+    <div class="daily-dialog-content">
+        <header class="dialog-heading daily-heading">
+            <div>
+                <p class="eyebrow">{{ t('daily.eyebrow') }}</p>
+                <h2>{{ t('daily.title') }}</h2>
+            </div>
+            <button type="button" class="daily-dialog-close dialog-close" aria-label="{{ t('worklog.cancel') }}">×</button>
+        </header>
+        <p id="daily-status" class="daily-status muted" aria-live="polite"></p>
+        <div id="daily-columns" class="daily-columns" hidden>
+            <section class="daily-column" aria-labelledby="daily-reported-heading">
+                <div class="daily-column-heading">
+                    <div>
+                        <p class="eyebrow">{{ t('daily.previous_day') }}</p>
+                        <h3 id="daily-reported-heading">{{ t('daily.reported_issues') }}</h3>
+                    </div>
+                    <time id="daily-reported-date" class="daily-date"></time>
+                </div>
+                <div id="daily-reported-list" class="daily-list"></div>
+                <p id="daily-reported-empty" class="daily-empty muted" hidden>{{ t('daily.no_reported_issues') }}</p>
+            </section>
+            <section class="daily-column" aria-labelledby="daily-assigned-heading">
+                <div class="daily-column-heading">
+                    <div>
+                        <p class="eyebrow">{{ t('daily.current_work') }}</p>
+                        <h3 id="daily-assigned-heading">{{ t('daily.assigned_issues') }}</h3>
+                    </div>
+                    <span id="daily-statuses" class="daily-statuses"></span>
+                </div>
+                <div id="daily-assigned-list" class="daily-list"></div>
+                <p id="daily-assigned-empty" class="daily-empty muted" hidden>{{ t('daily.no_assigned_issues') }}</p>
+            </section>
+        </div>
+    </div>
+</dialog>

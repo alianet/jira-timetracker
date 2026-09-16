@@ -35,6 +35,17 @@
     const dayFilterButtons = document.querySelectorAll('.day-filter');
     const taskRows = document.querySelectorAll('.task-row');
     const dayFilterEmpty = document.getElementById('day-filter-empty');
+    const dailyButton = document.getElementById('daily-button');
+    const dailyDialog = document.getElementById('daily-dialog');
+    const dailyStatus = document.getElementById('daily-status');
+    const dailyColumns = document.getElementById('daily-columns');
+    const dailyReportedDate = document.getElementById('daily-reported-date');
+    const dailyStatuses = document.getElementById('daily-statuses');
+    const dailyReportedList = document.getElementById('daily-reported-list');
+    const dailyAssignedList = document.getElementById('daily-assigned-list');
+    const dailyReportedEmpty = document.getElementById('daily-reported-empty');
+    const dailyAssignedEmpty = document.getElementById('daily-assigned-empty');
+    const reportPeriodForm = document.getElementById('report-period-form');
     const defaultWorklogDate = dialog.dataset.defaultWorklogDate;
     const i18n = {
         searching: dialog.dataset.searching,
@@ -61,6 +72,7 @@
     let searchTimer = null;
     let userSearchController = null;
     let userSearchTimer = null;
+    let dailyController = null;
 
     const parseJsonResponse = async (response, fallbackMessage) => {
         if (response.status === 401) {
@@ -80,6 +92,66 @@
         return payload;
     };
 
+    const renderDailyIssues = (container, issues) => {
+        container.replaceChildren();
+        issues.forEach((issue) => {
+            const article = document.createElement('article');
+            article.className = 'daily-issue';
+            const header = document.createElement('div');
+            header.className = 'daily-issue-header';
+            const key = document.createElement('a');
+            key.href = issue.url;
+            key.target = '_blank';
+            key.rel = 'noopener';
+            key.textContent = issue.key;
+            const time = document.createElement('strong');
+            time.className = 'daily-time';
+            time.textContent = issue.timeSpent || dailyDialog.dataset.noTime;
+            header.append(key, time);
+            const title = document.createElement('h4');
+            title.textContent = issue.summary;
+            const description = document.createElement('p');
+            description.textContent = issue.description || dailyDialog.dataset.noDescription;
+            article.append(header, title, description);
+            if (issue.status) {
+                const status = document.createElement('span');
+                status.className = 'daily-issue-status';
+                status.textContent = issue.status;
+                article.append(status);
+            }
+            container.append(article);
+        });
+    };
+
+    const openDailyDialog = async () => {
+        dailyController?.abort();
+        dailyController = new AbortController();
+        dailyStatus.textContent = dailyDialog.dataset.loading;
+        dailyColumns.hidden = true;
+        dailyDialog.showModal();
+
+        try {
+            const response = await fetch('/api/daily', {
+                headers: {Accept: 'application/json'},
+                signal: dailyController.signal,
+            });
+            const payload = await parseJsonResponse(response, dailyDialog.dataset.loadFailed);
+            if (payload === null) return;
+
+            renderDailyIssues(dailyReportedList, payload.lastReportedIssues);
+            renderDailyIssues(dailyAssignedList, payload.assignedIssues);
+            dailyReportedDate.textContent = payload.lastReportedDate || '';
+            dailyReportedDate.dateTime = payload.lastReportedDate || '';
+            dailyStatuses.textContent = payload.statuses.join(' · ');
+            dailyReportedEmpty.hidden = payload.lastReportedIssues.length > 0;
+            dailyAssignedEmpty.hidden = payload.assignedIssues.length > 0;
+            dailyStatus.textContent = '';
+            dailyColumns.hidden = false;
+        } catch (error) {
+            if (error.name !== 'AbortError') dailyStatus.textContent = error.message;
+        }
+    };
+
     dayFilterButtons.forEach((button) => {
         button.addEventListener('click', () => {
             const shouldActivate = button.getAttribute('aria-pressed') !== 'true';
@@ -97,6 +169,10 @@
             });
             if (dayFilterEmpty) dayFilterEmpty.hidden = !shouldActivate || visibleRows > 0;
         });
+    });
+
+    reportPeriodForm.querySelectorAll('select[name="month"], select[name="year"]').forEach((select) => {
+        select.addEventListener('change', () => reportPeriodForm.requestSubmit());
     });
 
     const showUserSearchStatus = (message) => {
@@ -351,9 +427,15 @@
     timeInput.addEventListener('blur', () => {
         timeInput.value = normalizeTimeSpent(timeInput.value);
     });
-    document.querySelectorAll('.dialog-close, .dialog-cancel').forEach((button) => button.addEventListener('click', () => dialog.close()));
+    document.querySelectorAll('.worklog-dialog .dialog-close, .worklog-dialog .dialog-cancel').forEach((button) => button.addEventListener('click', () => dialog.close()));
     dialog.addEventListener('click', (event) => {
         if (event.target === dialog) dialog.close();
     });
+    dailyButton.addEventListener('click', openDailyDialog);
+    dailyDialog.querySelector('.daily-dialog-close').addEventListener('click', () => dailyDialog.close());
+    dailyDialog.addEventListener('click', (event) => {
+        if (event.target === dailyDialog) dailyDialog.close();
+    });
+    dailyDialog.addEventListener('close', () => dailyController?.abort());
 
 })();

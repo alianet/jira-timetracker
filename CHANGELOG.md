@@ -5,8 +5,19 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Daily overview
+
+- Added a responsive Daily dialog showing issues from the current user's most
+  recently reported day alongside issues currently assigned to them.
+- Daily issue cards include the issue key, summary, description excerpt, time
+  spent, and the current status for assigned issues.
+- Added the `DAILY_STATUSES` setting for configuring which Jira statuses are
+  included in the assigned-issues column.
+
 ### Time reporting
 
+- Month and year changes now reload the report immediately, removing the separate
+  report submission button from the toolbar.
 - Added the `REPORT_TIME_FORMAT` setting for choosing between compact hours and
   minutes (`human`, for example `7h14m`) and decimal hours (`decimal`, for example
   `7,25`) throughout the report page.
