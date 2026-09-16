@@ -12,6 +12,7 @@ final readonly class ReportRowView
     /**
      * @param array<int, list<array{id: string, timeSpent: string, comment: string}>> $dailyWorklogs
      * @param array<int, float> $dailyHours
+     * @param array<int, string> $dailyTimes
      */
     public function __construct(
         public string $issue,
@@ -19,6 +20,8 @@ final readonly class ReportRowView
         public string $url,
         public array $dailyWorklogs,
         public array $dailyHours,
+        public array $dailyTimes,
         public float $totalHours,
+        public string $totalTime,
     ) {}
 }

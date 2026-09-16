@@ -29,6 +29,7 @@ final readonly class ReportView
         public string $endDate,
         public string $defaultWorklogDate,
         public float $totalHours,
+        public string $totalTime,
         public float $totalDays,
         public array $days,
         public array $rows,

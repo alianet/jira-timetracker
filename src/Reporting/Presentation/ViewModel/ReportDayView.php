@@ -16,5 +16,6 @@ final readonly class ReportDayView
         public string $cssClasses,
         public string $title,
         public float $totalHours,
+        public string $totalTime,
     ) {}
 }

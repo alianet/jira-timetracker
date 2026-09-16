@@ -31,6 +31,7 @@
                         </th>
                         {% for day in report.days %}
                             {% set hours = row.dailyHours[day.number] %}
+                            {% set time = row.dailyTimes[day.number] %}
                             <td class="numeric {{ hours > 0 ? 'has-hours' }} {{ day.cssClasses }}"
                                 data-day="{{ day.number }}" data-has-hours="{{ hours > 0 ? 'true' : 'false' }}">
                                 {% if report.isOwnReport %}<button type="button" class="worklog-trigger"
@@ -38,17 +39,17 @@
                                         data-summary="{{ row.summary }}"
                                         data-date="{{ day.date }}"
                                         data-worklogs="{{ row.dailyWorklogs[day.number]|json_encode|e('html_attr') }}"
-                                        title="{{ hours > 0 ? t('report.edit_or_add') : t('report.log_time') }}: {{ row.issue }}, {{ day.date }}">{{ hours > 0 ? hours|number_format(2, ',', ' ') ~ ' ✎' : '＋' }}</button>{% elseif hours > 0 %}<button type="button" class="worklog-trigger worklog-view-trigger"
+                                        title="{{ hours > 0 ? t('report.edit_or_add') : t('report.log_time') }}: {{ row.issue }}, {{ day.date }}">{{ hours > 0 ? time ~ ' ✎' : '＋' }}</button>{% elseif hours > 0 %}<button type="button" class="worklog-trigger worklog-view-trigger"
                                         data-issue="{{ row.issue }}"
                                         data-summary="{{ row.summary }}"
                                         data-date="{{ day.date }}"
                                         data-readonly="true"
                                         data-worklogs="{{ row.dailyWorklogs[day.number]|json_encode|e('html_attr') }}"
-                                        title="{{ t('report.view_worklogs') }}: {{ row.issue }}, {{ day.date }}">{{ hours|number_format(2, ',', ' ') }}</button>{% else %}—{% endif %}
+                                        title="{{ t('report.view_worklogs') }}: {{ row.issue }}, {{ day.date }}">{{ time }}</button>{% else %}—{% endif %}
                             </td>
                         {% endfor %}
                         <td class="total-column numeric">
-                            <strong>{{ row.totalHours|number_format(2, ',', ' ') }}</strong></td>
+                            <strong>{{ row.totalTime }}</strong></td>
                     </tr>
                 {% else %}
                     <tr>
@@ -65,9 +66,9 @@
                 <tr>
                 <th class="issue-column" scope="row">{{ t('report.day_total') }}</th>
                     {% for day in report.days %}
-                        <td class="numeric {{ day.cssClasses }}">{{ day.totalHours > 0 ? day.totalHours|number_format(2, ',', ' ') : '—' }}</td>
+                        <td class="numeric {{ day.cssClasses }}">{{ day.totalHours > 0 ? day.totalTime : '—' }}</td>
                     {% endfor %}
-                    <td class="total-column numeric"><strong>{{ report.totalHours|number_format(2, ',', ' ') }}</strong></td>
+                    <td class="total-column numeric"><strong>{{ report.totalTime }}</strong></td>
                 </tr>
                 </tfoot>
             </table>

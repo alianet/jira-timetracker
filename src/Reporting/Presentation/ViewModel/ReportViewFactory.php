@@ -13,10 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportViewFactory
 {
+    public const string TIME_FORMAT_DECIMAL = 'decimal';
+    public const string TIME_FORMAT_HUMAN = 'human';
+
     /** @param \Closure(string): string $issueUrl */
     public function __construct(
         private TranslatorInterface $translator,
         private \Closure $issueUrl,
+        private string $timeFormat = self::TIME_FORMAT_HUMAN,
     ) {}
 
     public function create(MonthlyReport $report, ReportViewContext $context): ReportView
@@ -44,7 +48,9 @@ final readonly class ReportViewFactory
                 url: ($this->issueUrl)($row->issue->toString()),
                 dailyWorklogs: $dailyWorklogs,
                 dailyHours: array_map(self::hours(...), $row->dailySeconds),
+                dailyTimes: array_map($this->formatTime(...), $row->dailySeconds),
                 totalHours: self::hours($row->totalSeconds),
+                totalTime: $this->formatTime($row->totalSeconds),
             );
         }
 
@@ -57,6 +63,7 @@ final readonly class ReportViewFactory
                 cssClasses: $this->dayClasses($day),
                 title: $this->dayTitle($day),
                 totalHours: self::hours($day->totalSeconds),
+                totalTime: $this->formatTime($day->totalSeconds),
             );
         }
 
@@ -74,6 +81,7 @@ final readonly class ReportViewFactory
             endDate: $report->period->endDate(),
             defaultWorklogDate: $context->defaultWorklogDate,
             totalHours: round(self::hours($report->totalSeconds), 2),
+            totalTime: $this->formatTime($report->totalSeconds),
             totalDays: round($report->totalDays, 2),
             days: $days,
             rows: $rows,
@@ -102,6 +110,20 @@ final readonly class ReportViewFactory
         $minutes = intdiv($seconds % 3600, 60);
 
         return trim(($hours > 0 ? "{$hours}h" : '') . ($minutes > 0 ? " {$minutes}m" : '')) ?: '0m';
+    }
+
+    private static function formatCompactSeconds(int $seconds): string
+    {
+        return str_replace(' ', '', self::formatSeconds($seconds));
+    }
+
+    private function formatTime(int $seconds): string
+    {
+        return match ($this->timeFormat) {
+            self::TIME_FORMAT_DECIMAL => number_format(self::hours($seconds), 2, ',', ' '),
+            self::TIME_FORMAT_HUMAN => self::formatCompactSeconds($seconds),
+            default => throw new \LogicException('Unsupported report time format.'),
+        };
     }
 
     private function dayClasses(ReportDay $day): string

@@ -187,10 +187,15 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SUMMARY","","Work time total:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+REPORT_TIME_FORMAT=human
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
 ```
+
+`REPORT_TIME_FORMAT` controls how durations are displayed on the report page.
+Use `human` for the hours-and-minutes format (`7h14m`) or `decimal` for decimal
+hours rounded to two decimal places (`7,25`). The default value is `human`.
 
 `REPORT_EXPORT_ENABLED=false` hides the download button and blocks the export
 endpoint. If this variable is missing or set to `false`, export stays disabled and

@@ -196,10 +196,16 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["RÉSUMÉ","","Temps de travail total :","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+REPORT_TIME_FORMAT=human
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
 ```
+
+`REPORT_TIME_FORMAT` définit l’affichage du temps sur la page du rapport.
+La valeur `human` utilise les heures et minutes (`7h14m`), tandis que `decimal`
+affiche les heures décimales arrondies à deux décimales (`7,25`). La valeur par
+défaut est `human`.
 
 `REPORT_EXPORT_ENABLED=false` masque le bouton de téléchargement et bloque l’endpoint
 d’export. Si cette variable est absente ou vaut `false`, l’export reste désactivé et

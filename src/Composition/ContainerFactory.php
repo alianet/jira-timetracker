@@ -353,8 +353,14 @@ final class ContainerFactory
     public static function reportViewFactory(
         TranslatorInterface $translator,
         Connection $connection,
+        Config $config,
     ): ReportViewFactory {
-        return new ReportViewFactory($translator, self::issueUrl($connection->siteUrl));
+        $timeFormat = $config->choice('REPORT_TIME_FORMAT', [
+            ReportViewFactory::TIME_FORMAT_DECIMAL,
+            ReportViewFactory::TIME_FORMAT_HUMAN,
+        ], ReportViewFactory::TIME_FORMAT_HUMAN);
+
+        return new ReportViewFactory($translator, self::issueUrl($connection->siteUrl), $timeFormat);
     }
 
     public static function csvReportExporter(

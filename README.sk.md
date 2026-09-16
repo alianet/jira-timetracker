@@ -186,10 +186,16 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SÚHRN","","Celkový pracovný čas:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+REPORT_TIME_FORMAT=human
 DAILY_HOURS_LIMIT=7.5
 APP_TIMEZONE=Europe/Warsaw
 LOG_LEVEL=error
 ```
+
+`REPORT_TIME_FORMAT` určuje spôsob zobrazenia času na stránke prehľadu.
+Hodnota `human` používa hodiny a minúty (`7h14m`), zatiaľ čo `decimal` zobrazuje
+desatinné hodiny zaokrúhlené na dve desatinné miesta (`7,25`). Predvolená hodnota
+je `human`.
 
 `REPORT_EXPORT_ENABLED=false` skryje tlačidlo stiahnutia a zablokuje exportný endpoint.
 Ak premenná chýba alebo je nastavená na `false`, export zostane vypnutý a ostatné

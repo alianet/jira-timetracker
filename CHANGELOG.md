@@ -5,6 +5,12 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Time reporting
+
+- Added the `REPORT_TIME_FORMAT` setting for choosing between compact hours and
+  minutes (`human`, for example `7h14m`) and decimal hours (`decimal`, for example
+  `7,25`) throughout the report page.
+
 ### Architecture
 
 - Replaced the manually assembled application object graph with a compiled Symfony
