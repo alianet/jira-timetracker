@@ -138,7 +138,9 @@ final class ReportPageControllerTest extends TestCase
         self::assertStringContainsString('data-default-worklog-date="2024-02-01"', $html);
         self::assertStringContainsString('data-delete-confirm=', $html);
         self::assertStringContainsString('Pokaż tylko zadania z wpisami w dniu 2024-02-01', $html);
-        self::assertStringContainsString('<script src="/js/report.js" defer></script>', $html);
+        self::assertMatchesRegularExpression('#<link rel="stylesheet" href="/css/app\.css\?v=\d+">#', $html);
+        self::assertMatchesRegularExpression('#<script src="/js/locale\.js\?v=\d+" defer></script>#', $html);
+        self::assertMatchesRegularExpression('#<script src="/js/report\.js\?v=\d+" defer></script>#', $html);
         self::assertStringNotContainsString('const defaultWorklogDate', $html);
     }
 }

@@ -18,5 +18,5 @@
     {% include 'report/_matrix.html.twig' with {report: report} only %}
     {% include 'report/_worklog_dialog.html.twig' with {report: report} only %}
     {% include 'report/_daily_dialog.html.twig' only %}
-    <script src="/js/report.js" defer></script>
+    <script src="{{ asset('/js/report.js') }}" defer></script>
 {% endblock %}

@@ -31,6 +31,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ### Configuration and operations
 
+- CSS and JavaScript asset URLs now include their modification timestamp to
+  invalidate browser caches automatically after deployments.
 - Added the `composer cache:container:warmup` command and automatic container warmup
   after Composer install and update operations.
 - Production requests now require the prebuilt container cache, while debug mode

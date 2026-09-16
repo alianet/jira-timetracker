@@ -16,6 +16,7 @@ final class EnvironmentFactory
     public function create(string $templatesDirectory, TranslatorInterface $translator): Environment
     {
         $twig = new Environment(new FilesystemLoader($templatesDirectory));
+        $twig->addExtension(new AssetExtension(dirname($templatesDirectory) . '/public'));
         $twig->addExtension(new CalendarExtension($translator));
         $twig->addExtension(new TranslationExtension($translator));
 
