@@ -73,6 +73,7 @@
     let userSearchController = null;
     let userSearchTimer = null;
     let dailyController = null;
+    let worklogSubmitting = false;
 
     const parseJsonResponse = async (response, fallbackMessage) => {
         if (response.status === 401) {
@@ -508,6 +509,15 @@
     });
     timeInput.addEventListener('blur', () => {
         timeInput.value = normalizeTimeSpent(timeInput.value);
+    });
+    worklogForm.addEventListener('submit', (event) => {
+        if (worklogSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        worklogSubmitting = true;
+        submitButton.disabled = true;
     });
     document.querySelectorAll('.worklog-dialog .dialog-close, .worklog-dialog .dialog-cancel').forEach((button) => button.addEventListener('click', () => dialog.close()));
     dialog.addEventListener('click', (event) => {

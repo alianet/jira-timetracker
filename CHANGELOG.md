@@ -26,6 +26,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
   report submission button from the toolbar.
 - Newly logged issues now appear immediately when the report is refreshed after
   saving their first worklog in the selected month.
+- Worklog submission now disables the save button and ignores repeated submissions
+  to prevent duplicate Jira entries caused by rapid clicks.
 - Added the `REPORT_TIME_FORMAT` setting for choosing between compact hours and
   minutes (`human`, for example `7h14m`) and decimal hours (`decimal`, for example
   `7,25`) throughout the report page.

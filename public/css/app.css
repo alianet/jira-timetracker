@@ -47,6 +47,7 @@ label { display: grid; gap: 6px; color: #475467; font-size: .8rem; font-weight: 
 select, button, input, textarea, .button { min-height: 40px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 0 12px; background: white; font: inherit; }
 textarea { padding: 10px 12px; resize: vertical; }
 button { border-color: #2563eb; color: white; background: #2563eb; font-weight: 700; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .65; }
 .button { display: inline-flex; align-items: center; justify-content: center; border-color: #2563eb; color: white; background: #2563eb; font-weight: 700; }
 .login-card { max-width: 520px; margin: min(18vh, 160px) auto; padding: 40px; border: 1px solid #e4e7ec; border-radius: 18px; background: white; box-shadow: 0 20px 60px #10182814; }
 .login-card .locale-switcher { margin: -16px -16px 20px 0; }
