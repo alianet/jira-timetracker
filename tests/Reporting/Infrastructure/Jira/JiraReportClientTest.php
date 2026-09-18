@@ -9,6 +9,7 @@ namespace Tests\Reporting\Infrastructure\Jira;
 
 use App\Kernel\Exception\ApplicationRuntimeException as WorkLogRuntimeException;
 use App\Kernel\Infrastructure\Translation\TranslatorFactory;
+use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\WorklogAuthorId;
 use App\Reporting\Infrastructure\Jira\JiraReportClient;
 use App\Shared\Infrastructure\Http\SymfonyJsonHttpTransport;
@@ -82,6 +83,29 @@ final class JiraReportClientTest extends TestCase
         self::assertSame('', $report->avatarUrl);
         self::assertTrue($report->isOwnReport);
         self::assertSame([], $report->entries);
+    }
+
+    public function testIncludesRequiredIssueInJqlAfterSavingFirstWorklog(): void
+    {
+        $requests = 0;
+        $capturedJql = null;
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests, &$capturedJql): MockResponse {
+            ++$requests;
+            if ($requests === 1) {
+                return new MockResponse('{"accountId":"current"}');
+            }
+
+            $capturedJql = $options['query']['jql'] ?? null;
+
+            return new MockResponse('{"issues":[]}');
+        });
+
+        $this->client($http)->worklogReport(2026, 9, null, IssueKey::fromString('APP-42'));
+
+        self::assertSame(
+            '(worklogAuthor = "current" AND worklogDate >= \'2026-09-01\' AND worklogDate <= \'2026-09-30\') OR key = "APP-42"',
+            $capturedJql,
+        );
     }
 
     /** @return array<string, mixed> */

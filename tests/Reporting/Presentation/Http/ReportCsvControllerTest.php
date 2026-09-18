@@ -15,6 +15,7 @@ use App\Reporting\Application\ExportMonthlyReportHandler;
 use App\Reporting\Application\Port\ReportExporter;
 use App\Reporting\Application\Port\WorklogReportSource;
 use App\Reporting\Application\WorklogReportData;
+use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\ReportPeriod;
 use App\Reporting\Domain\ReportTimeZone;
 use App\Reporting\Domain\WorklogAuthorId;
@@ -30,8 +31,11 @@ final class ReportCsvControllerTest extends TestCase
             public ?ReportPeriod $period = null;
             public ?WorklogAuthorId $authorId = null;
 
-            public function forUser(ReportPeriod $period, ?WorklogAuthorId $authorId = null): WorklogReportData
-            {
+            public function forUser(
+                ReportPeriod $period,
+                ?WorklogAuthorId $authorId = null,
+                ?IssueKey $requiredIssue = null,
+            ): WorklogReportData {
                 $this->period = $period;
                 $this->authorId = $authorId;
 

@@ -11,6 +11,7 @@ use App\Kernel\Presentation\Http\Request;
 use App\Kernel\Presentation\Http\Response;
 use App\Kernel\Support\ApiValue;
 use App\Reporting\Application\GenerateMonthlyReportHandler;
+use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\ReportPeriod;
 use App\Reporting\Domain\ReportTimeZone;
 use App\Reporting\Domain\WorklogAuthorId;
@@ -52,9 +53,13 @@ final readonly class ReportPageController
         $query = ApiValue::stringMap($request->query);
         $reportQuery = ReportQuery::fromQuery($query);
         $authorId = trim($query['accountId'] ?? '') === '' ? null : WorklogAuthorId::fromString($query['accountId']);
+        $requiredIssue = ($query['saved'] ?? '') === '1' && trim($query['issue'] ?? '') !== ''
+            ? IssueKey::fromString(trim($query['issue']))
+            : null;
         $generated = ($this->generateReport)()->handle(
             new ReportPeriod($reportQuery->year, $reportQuery->month, $this->timezone),
             $authorId,
+            $requiredIssue,
         );
         $this->logger->info('Monthly Jira report generated.', [
             'year' => $reportQuery->year,

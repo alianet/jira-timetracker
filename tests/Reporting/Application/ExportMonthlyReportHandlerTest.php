@@ -46,8 +46,11 @@ final class ExportMonthlyReportHandlerTest extends TestCase
 
             public function __construct(private WorklogReportData $data) {}
 
-            public function forUser(ReportPeriod $period, ?WorklogAuthorId $authorId = null): WorklogReportData
-            {
+            public function forUser(
+                ReportPeriod $period,
+                ?WorklogAuthorId $authorId = null,
+                ?IssueKey $requiredIssue = null,
+            ): WorklogReportData {
                 $this->period = $period;
                 $this->authorId = $authorId;
 

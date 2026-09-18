@@ -10,6 +10,7 @@ namespace App\Reporting\Infrastructure\Jira;
 use App\Kernel\Exception\ApplicationRuntimeException as WorkLogRuntimeException;
 use App\Kernel\Exception\RateLimitExceededException;
 use App\Kernel\Support\ApiValue;
+use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\WorklogAuthorId;
 use App\Shared\Infrastructure\Http\HttpTransportException;
 use App\Shared\Infrastructure\Http\JsonHttpTransport;
@@ -28,8 +29,12 @@ final readonly class JiraReportClient
     ) {}
 
     /** @throws JsonException */
-    public function worklogReport(int $year, int $month, ?WorklogAuthorId $selectedAuthorId = null): JiraWorklogReport
-    {
+    public function worklogReport(
+        int $year,
+        int $month,
+        ?WorklogAuthorId $selectedAuthorId = null,
+        ?IssueKey $requiredIssue = null,
+    ): JiraWorklogReport {
         $startDate = \sprintf('%04d-%02d-01', $year, $month);
         try {
             $endTimestamp = strtotime("{$startDate} +1 month -1 day");
@@ -46,6 +51,10 @@ final readonly class JiraReportClient
             : ApiValue::object($this->request('/rest/api/3/user', null, 'GET', ['accountId' => $accountId]));
         $escapedAccountId = \str_replace(['\\', '"'], ['\\\\', '\\"'], $accountId);
         $jql = "worklogAuthor = \"{$escapedAccountId}\" AND worklogDate >= '{$startDate}' AND worklogDate <= '{$endDate}'";
+        if ($requiredIssue !== null) {
+            $escapedIssue = \str_replace(['\\', '"'], ['\\\\', '\\"'], $requiredIssue->toString());
+            $jql = "({$jql}) OR key = \"{$escapedIssue}\"";
+        }
         $issues = $this->searchAllIssues($jql);
 
         $entries = [];

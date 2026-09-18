@@ -24,6 +24,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 - Month and year changes now reload the report immediately, removing the separate
   report submission button from the toolbar.
+- Newly logged issues now appear immediately when the report is refreshed after
+  saving their first worklog in the selected month.
 - Added the `REPORT_TIME_FORMAT` setting for choosing between compact hours and
   minutes (`human`, for example `7h14m`) and decimal hours (`decimal`, for example
   `7,25`) throughout the report page.
@@ -47,6 +49,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
   automatically rebuilds stale cache entries after tracked source changes.
 - Container cache writes are atomic and the Docker entrypoint prepares cache directory
   permissions for both deployment warmup and application runtime access.
+- CI Docker Compose runs now ignore repository environment files to keep quality
+  checks independent from local configuration.
 - Updated `alianet/env-sync` to 1.2.0 and added account-type-dependent checks
   for individual API token credentials and company OAuth credentials.
 - Replaced string-based account-type handling with the typed `AccountType` enum
@@ -56,6 +60,7 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 - Added Symfony Config and DependencyInjection 8.1 components for container
   compilation, resource tracking, and cache freshness checks.
+- Updated PHPUnit from 12.5 to 13.3.
 
 ### Documentation
 

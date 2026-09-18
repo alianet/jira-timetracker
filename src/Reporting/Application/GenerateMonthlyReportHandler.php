@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Reporting\Application;
 
 use App\Reporting\Application\Port\WorklogReportSource;
+use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\MonthlyReport;
 use App\Reporting\Domain\ReportPeriod;
 use App\Reporting\Domain\WorkdayPolicy;
@@ -21,9 +22,12 @@ final readonly class GenerateMonthlyReportHandler
         private int $dailySecondsLimit,
     ) {}
 
-    public function handle(ReportPeriod $period, ?WorklogAuthorId $authorId = null): GeneratedMonthlyReport
-    {
-        $data = $this->source->forUser($period, $authorId);
+    public function handle(
+        ReportPeriod $period,
+        ?WorklogAuthorId $authorId = null,
+        ?IssueKey $requiredIssue = null,
+    ): GeneratedMonthlyReport {
+        $data = $this->source->forUser($period, $authorId, $requiredIssue);
         $report = MonthlyReport::generate($data->entries, $period, $this->dailySecondsLimit, $this->workdayPolicy);
 
         return new GeneratedMonthlyReport(

@@ -29,11 +29,16 @@ final class GenerateMonthlyReportHandlerTest extends TestCase
         $source = new class implements WorklogReportSource {
             public ?ReportPeriod $receivedPeriod = null;
             public ?WorklogAuthorId $receivedAuthorId = null;
+            public ?IssueKey $receivedRequiredIssue = null;
 
-            public function forUser(ReportPeriod $period, ?WorklogAuthorId $authorId = null): WorklogReportData
-            {
+            public function forUser(
+                ReportPeriod $period,
+                ?WorklogAuthorId $authorId = null,
+                ?IssueKey $requiredIssue = null,
+            ): WorklogReportData {
                 $this->receivedPeriod = $period;
                 $this->receivedAuthorId = $authorId;
+                $this->receivedRequiredIssue = $requiredIssue;
 
                 return new WorklogReportData(
                     [new WorklogEntry(
@@ -72,11 +77,13 @@ final class GenerateMonthlyReportHandlerTest extends TestCase
         $result = $handler->handle(
             new ReportPeriod(2026, 4, ReportTimeZone::fromName('Europe/Warsaw')),
             WorklogAuthorId::fromString(' selected '),
+            IssueKey::fromString('APP-1'),
         );
 
         self::assertSame(3600, $result->report->totalSeconds);
         self::assertSame('Selected User', $result->displayName);
         self::assertSame('selected', $source->receivedAuthorId?->toString());
+        self::assertSame('APP-1', $source->receivedRequiredIssue?->toString());
         self::assertSame(4, $source->receivedPeriod?->month);
     }
 }

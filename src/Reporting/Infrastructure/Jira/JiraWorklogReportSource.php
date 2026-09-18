@@ -24,9 +24,12 @@ final readonly class JiraWorklogReportSource implements WorklogReportSource
         private ReportTimeZone $timezone,
     ) {}
 
-    public function forUser(ReportPeriod $period, ?WorklogAuthorId $authorId = null): WorklogReportData
-    {
-        $jiraReport = $this->jira->worklogReport($period->year, $period->month, $authorId);
+    public function forUser(
+        ReportPeriod $period,
+        ?WorklogAuthorId $authorId = null,
+        ?IssueKey $requiredIssue = null,
+    ): WorklogReportData {
+        $jiraReport = $this->jira->worklogReport($period->year, $period->month, $authorId, $requiredIssue);
         $entries = [];
         foreach ($jiraReport->entries as $entry) {
             $entries[] = new WorklogEntry(
