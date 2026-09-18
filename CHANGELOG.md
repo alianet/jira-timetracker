@@ -37,6 +37,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ### Configuration and operations
 
+- The PHP container now runs `composer install` automatically on startup using
+  the mounted project's UID and GID to preserve host filesystem ownership.
 - CSS and JavaScript asset URLs now include their modification timestamp to
   invalidate browser caches automatically after deployments.
 - Added the `composer cache:container:warmup` command and automatic container warmup

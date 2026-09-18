@@ -4,7 +4,7 @@ FROM php:8.5-fpm-alpine
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
-RUN apk add --no-cache curl-dev git openssh-client \
+RUN apk add --no-cache curl-dev git openssh-client su-exec \
     && docker-php-ext-install curl \
     && git config --system url."git@github.com:".insteadOf "https://github.com/" \
     && git config --system --add safe.directory /var/www/html
