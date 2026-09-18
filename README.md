@@ -40,7 +40,7 @@ must be the token generated for the same account. In this mode you do not config
 
 This mode requires creating an OAuth 2.0 (3LO) app in the Atlassian developer
 console. Set the callback to `http://localhost:81/oauth/callback`, add the scopes
-`read:jira-work`, `write:jira-work`, `read:jira-user`, and `offline_access`, then
+`read:jira-work`, `write:jira-work`, `read:jira-user`, `read:sprint:jira-software`, and `offline_access`, then
 fill in `.env`:
 
 ```dotenv

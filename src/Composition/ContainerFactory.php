@@ -50,6 +50,7 @@ use App\Shared\Infrastructure\SystemClock;
 use App\TimeTracking\Application\Handler\AddWorklogHandler;
 use App\TimeTracking\Application\Handler\DeleteWorklogHandler;
 use App\TimeTracking\Application\Handler\UpdateWorklogHandler;
+use App\TimeTracking\Application\Query\DailyIssueGrouper;
 use App\TimeTracking\Application\Query\DailyOverviewDirectory;
 use App\TimeTracking\Domain\Model\WorkTimeUnits;
 use App\TimeTracking\Infrastructure\Jira\JiraDailyOverviewDirectory;
@@ -368,11 +369,14 @@ final class ContainerFactory
             static fn(string $status): string => trim($status),
             explode(',', $config->nullable('DAILY_STATUSES') ?? 'TO DO,IN PROGRESS'),
         ), static fn(string $status): bool => $status !== ''));
+        $primaryBoardId = $config->nullablePositiveInt('DAILY_PRIMARY_BOARD_ID');
 
         return new JiraDailyOverviewDirectory(
             $transport,
             $connection->siteUrl,
             $statuses === [] ? ['TO DO', 'IN PROGRESS'] : $statuses,
+            $primaryBoardId,
+            new DailyIssueGrouper(),
         );
     }
 

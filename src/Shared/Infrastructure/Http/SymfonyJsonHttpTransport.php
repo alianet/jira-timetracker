@@ -96,7 +96,7 @@ final readonly class SymfonyJsonHttpTransport implements JsonHttpTransport
             throw HttpTransportException::unexpectedJsonPayload();
         }
 
-        /** @var array<string, mixed> $decoded */
+        /** @var array<array-key, mixed> $decoded */
         return $decoded;
     }
 

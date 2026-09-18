@@ -18,5 +18,8 @@ final readonly class DailyIssue
         public string $timeSpent,
         public string $url,
         public string $status = '',
+        /** @var list<int> */
+        public array $sprintIds = [],
+        public bool $unassigned = false,
     ) {}
 }

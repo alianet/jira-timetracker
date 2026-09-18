@@ -91,6 +91,9 @@ return [
     'daily.no_assigned_issues' => 'Keine zugewiesenen Vorgänge mit den konfigurierten Status.',
     'daily.no_description' => 'Keine Beschreibung.',
     'daily.no_time' => '0m',
+    'daily.no_sprint' => 'Ohne Sprint',
+    'daily.primary_team' => 'Hauptteam',
+    'daily.unassigned' => 'Nicht zugewiesen',
 
     'worklog.title' => 'Zeiterfassung',
     'worklog.history' => 'Verlauf der Zeiteinträge',

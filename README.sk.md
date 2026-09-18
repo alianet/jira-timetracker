@@ -41,7 +41,8 @@ token vygenerovaný pre rovnaký účet. V tomto režime nenastavujete `ATLASSIA
 
 Tento režim vyžaduje vytvorenie aplikácie OAuth 2.0 (3LO) v Atlassian Developer Console.
 Nastavte callback na `http://localhost:81/oauth/callback`, pridajte oprávnenia
-`read:jira-work`, `write:jira-work`, `read:jira-user` a `offline_access` a vyplňte `.env`:
+`read:jira-work`, `write:jira-work`, `read:jira-user`, `read:sprint:jira-software` a
+`offline_access` a vyplňte `.env`:
 
 ```dotenv
 JIRA_URL=https://vasa-firma.atlassian.net

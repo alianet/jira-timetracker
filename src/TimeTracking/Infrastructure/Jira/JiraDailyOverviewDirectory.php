@@ -9,9 +9,13 @@ namespace App\TimeTracking\Infrastructure\Jira;
 
 use App\Kernel\Support\ApiValue;
 use App\TimeTracking\Application\Query\DailyIssue;
+use App\TimeTracking\Application\Query\DailyIssueGrouper;
 use App\TimeTracking\Application\Query\DailyOverview;
 use App\TimeTracking\Application\Query\DailyOverviewDirectory;
+use App\TimeTracking\Application\Query\DailySprint;
 use App\TimeTracking\Domain\Model\IssueKey;
+
+use function Safe\preg_match_all;
 
 final readonly class JiraDailyOverviewDirectory implements DailyOverviewDirectory
 {
@@ -22,13 +26,23 @@ final readonly class JiraDailyOverviewDirectory implements DailyOverviewDirector
         private JiraTransport $transport,
         private string $siteUrl,
         private array $statuses,
+        private ?int $primaryBoardId,
+        private DailyIssueGrouper $issueGrouper,
     ) {}
 
     public function get(): DailyOverview
     {
         [$date, $reportedIssues] = $this->lastReportedIssues();
 
-        return new DailyOverview($date, $reportedIssues, $this->assignedIssues(), $this->statuses);
+        [$assignedIssues, $sprints] = $this->dailyIssues();
+
+        return new DailyOverview(
+            $date,
+            $reportedIssues,
+            $assignedIssues,
+            $this->statuses,
+            $this->issueGrouper->group($assignedIssues, $sprints),
+        );
     }
 
     /** @return array{?string, list<DailyIssue>} */
@@ -103,28 +117,117 @@ final readonly class JiraDailyOverviewDirectory implements DailyOverviewDirector
         return [$latestDate, $result];
     }
 
-    /** @return list<DailyIssue> */
-    private function assignedIssues(): array
+    /** @return array{list<DailyIssue>, array<int, DailySprint>} */
+    private function dailyIssues(): array
     {
         $quotedStatuses = array_map(
             static fn(string $status): string => '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], $status) . '"',
             $this->statuses,
         );
-        $jql = 'assignee = currentUser() AND status IN (' . implode(', ', $quotedStatuses) . ') ORDER BY updated DESC';
-        $issues = $this->searchAll($jql, 'summary,description,status,timespent');
+        $sprintFieldId = $this->sprintFieldId();
+        $fields = ['summary', 'description', 'status', 'timespent'];
+        if ($sprintFieldId !== null) {
+            $fields[] = $sprintFieldId;
+        }
+        $fields = implode(',', $fields);
+        $sprints = $this->primaryActiveSprints();
+        $assignedIssues = $this->mapDailyIssues(
+            $this->searchAll(
+                'assignee = currentUser() AND status IN (' . implode(', ', $quotedStatuses) . ') ORDER BY updated DESC',
+                $fields,
+            ),
+            $sprintFieldId,
+            $sprints,
+        );
+        if ($this->primaryBoardId === null) {
+            return [$assignedIssues, $sprints];
+        }
 
-        return array_map(fn(array $issue): DailyIssue => $this->mapIssue(
-            $issue,
-            ApiValue::intValue(ApiValue::object($issue['fields'] ?? null)['timespent'] ?? null),
+        $unassignedIssues = $this->mapDailyIssues(
+            $this->searchAll(
+                'assignee IS EMPTY AND status IN (' . implode(', ', $quotedStatuses) . ') ORDER BY updated DESC',
+                $fields,
+            ),
+            $sprintFieldId,
+            $sprints,
             true,
-        ), $issues);
+        );
+
+        return [
+            [...$assignedIssues, ...array_values(array_filter(
+                $unassignedIssues,
+                fn(DailyIssue $issue): bool => $this->hasPrimaryActiveSprint($issue, $sprints),
+            ))],
+            $sprints,
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $issues
+     * @param array<int, DailySprint> $sprints
+     * @return list<DailyIssue>
+     */
+    private function mapDailyIssues(array $issues, ?string $sprintFieldId, array &$sprints, bool $unassigned = false): array
+    {
+        $result = [];
+        foreach ($issues as $issue) {
+            $fields = ApiValue::object($issue['fields'] ?? null);
+            $sprintIds = $this->mapIssueSprints(
+                $sprintFieldId === null ? null : ($fields[$sprintFieldId] ?? null),
+                $sprints,
+            );
+            $result[] = $this->mapIssue(
+                $issue,
+                ApiValue::intValue($fields['timespent'] ?? null),
+                true,
+                $sprintIds,
+                $unassigned,
+            );
+        }
+
+        return $result;
+    }
+
+    /** @return array<int, DailySprint> */
+    private function primaryActiveSprints(): array
+    {
+        if ($this->primaryBoardId === null) {
+            return [];
+        }
+
+        $sprints = [];
+        $startAt = 0;
+        do {
+            $page = $this->transport->request(
+                'GET',
+                '/rest/agile/1.0/board/' . $this->primaryBoardId . '/sprint',
+                null,
+                ['state' => 'active', 'startAt' => $startAt, 'maxResults' => 50],
+            );
+            $batch = $this->objects($page['values'] ?? null);
+            foreach ($batch as $rawSprint) {
+                $sprint = $this->mapSprint($rawSprint, true);
+                if ($sprint !== null) {
+                    $sprints[$sprint->id] = $sprint;
+                }
+            }
+            $startAt += count($batch);
+        } while ($batch !== [] && !($page['isLast'] ?? true));
+
+        return $sprints;
     }
 
     /**
      * @param array<string, mixed> $issue
+     * @param list<int> $sprintIds
      */
-    private function mapIssue(array $issue, int $seconds, bool $withStatus = false): DailyIssue
-    {
+    private function mapIssue(
+        array $issue,
+        int $seconds,
+        bool $withStatus = false,
+        array $sprintIds = [],
+        bool $unassigned = false,
+    ): DailyIssue {
         $key = ApiValue::stringValue($issue['key'] ?? null);
         $fields = ApiValue::object($issue['fields'] ?? null);
         $status = ApiValue::object($fields['status'] ?? null);
@@ -136,7 +239,110 @@ final readonly class JiraDailyOverviewDirectory implements DailyOverviewDirector
             $this->formatSeconds($seconds),
             rtrim($this->siteUrl, '/') . '/browse/' . $key,
             $withStatus ? ApiValue::stringValue($status['name'] ?? null) : '',
+            $sprintIds,
+            $unassigned,
         );
+    }
+
+    /** @param array<int, DailySprint> $sprints */
+    private function hasPrimaryActiveSprint(DailyIssue $issue, array $sprints): bool
+    {
+        foreach ($issue->sprintIds as $sprintId) {
+            $sprint = $sprints[$sprintId] ?? null;
+            if ($sprint?->primary && $sprint->state === 'active') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function sprintFieldId(): ?string
+    {
+        $fields = $this->transport->request('GET', '/rest/api/3/field');
+        foreach ($this->objects($fields) as $field) {
+            $schema = ApiValue::object($field['schema'] ?? null);
+            if (ApiValue::stringValue($schema['custom'] ?? null) !== 'com.pyxis.greenhopper.jira:gh-sprint') {
+                continue;
+            }
+
+            $id = ApiValue::stringValue($field['id'] ?? null);
+            if ($id !== '') {
+                return $id;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int, DailySprint> $sprints
+     * @return list<int>
+     */
+    private function mapIssueSprints(mixed $value, array &$sprints): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($value as $rawSprint) {
+            $sprint = $this->mapSprint($rawSprint);
+            if ($sprint === null) {
+                continue;
+            }
+
+            if (!isset($sprints[$sprint->id]) || !$sprints[$sprint->id]->primary || $sprint->primary) {
+                $sprints[$sprint->id] = $sprint;
+            }
+            $ids[] = $sprint->id;
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    private function mapSprint(mixed $rawSprint, bool $primaryBoardSprint = false): ?DailySprint
+    {
+        $sprint = is_array($rawSprint)
+            ? ApiValue::object($rawSprint)
+            : $this->legacySprint(ApiValue::stringValue($rawSprint));
+        $id = ApiValue::intValue($sprint['id'] ?? null);
+        $state = strtolower(ApiValue::stringValue($sprint['state'] ?? null));
+        if ($id <= 0 || !in_array($state, ['active', 'future'], true)) {
+            return null;
+        }
+
+        $originBoardId = ApiValue::intValue($sprint['originBoardId'] ?? $sprint['rapidViewId'] ?? null);
+        $primary = $primaryBoardSprint || ($originBoardId > 0 && $originBoardId === $this->primaryBoardId);
+
+        return new DailySprint(
+            $id,
+            ApiValue::stringValue($sprint['name'] ?? null),
+            $state,
+            $originBoardId > 0 ? $originBoardId : ($primaryBoardSprint ? $this->primaryBoardId : null),
+            $primary,
+            $this->nullableString($sprint['startDate'] ?? null),
+            $this->nullableString($sprint['endDate'] ?? null),
+        );
+    }
+
+    /** @return array<string, string> */
+    private function legacySprint(string $value): array
+    {
+        preg_match_all('/(?:^|,)(id|rapidViewId|state|name|startDate|endDate)=([^,\]]*)/', $value, $matches, PREG_SET_ORDER);
+        $sprint = [];
+        foreach ($matches as $match) {
+            $sprint[$match[1]] = $match[2] === '<null>' ? '' : $match[2];
+        }
+
+        return $sprint;
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        $value = ApiValue::stringValue($value);
+
+        return $value === '' ? null : $value;
     }
 
     /**

@@ -13,11 +13,13 @@ final readonly class DailyOverview
      * @param list<DailyIssue> $lastReportedIssues
      * @param list<DailyIssue> $assignedIssues
      * @param list<string> $statuses
+     * @param list<DailyIssueGroup> $assignedIssueGroups
      */
     public function __construct(
         public ?string $lastReportedDate,
         public array $lastReportedIssues,
         public array $assignedIssues,
         public array $statuses,
+        public array $assignedIssueGroups = [],
     ) {}
 }

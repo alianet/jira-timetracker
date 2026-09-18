@@ -42,8 +42,8 @@ pas `ATLASSIAN_CLIENT_ID`, `ATLASSIAN_CLIENT_SECRET` ni `ATLASSIAN_REDIRECT_URI`
 
 Ce mode nécessite la création d’une application OAuth 2.0 (3LO) dans la console
 Atlassian Developer. Définissez le callback sur `http://localhost:81/oauth/callback`,
-ajoutez les scopes `read:jira-work`, `write:jira-work`, `read:jira-user` et
-`offline_access`, puis complétez `.env` :
+ajoutez les scopes `read:jira-work`, `write:jira-work`, `read:jira-user`,
+`read:sprint:jira-software` et `offline_access`, puis complétez `.env` :
 
 ```dotenv
 JIRA_URL=https://votre-entreprise.atlassian.net

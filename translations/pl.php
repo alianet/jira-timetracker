@@ -91,6 +91,9 @@ return [
     'daily.no_assigned_issues' => 'Brak przypisanych zadań w skonfigurowanych statusach.',
     'daily.no_description' => 'Brak opisu.',
     'daily.no_time' => '0m',
+    'daily.no_sprint' => 'Bez sprintu',
+    'daily.primary_team' => 'Główny zespół',
+    'daily.unassigned' => 'Nieprzypisane',
 
     'worklog.title' => 'Logowanie czasu',
     'worklog.history' => 'Historia wpisów czasu',

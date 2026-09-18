@@ -92,41 +92,123 @@
         return payload;
     };
 
+    const dailyIssueElement = (issue) => {
+        const article = document.createElement('article');
+        article.className = 'daily-issue';
+        const header = document.createElement('div');
+        header.className = 'daily-issue-header';
+        const key = document.createElement('a');
+        key.href = issue.url;
+        key.target = '_blank';
+        key.rel = 'noopener';
+        key.textContent = issue.key;
+        const time = document.createElement('strong');
+        time.className = 'daily-time';
+        time.textContent = issue.timeSpent || dailyDialog.dataset.noTime;
+        header.append(key, time);
+        const title = document.createElement('h4');
+        title.textContent = issue.summary;
+        const description = document.createElement('p');
+        description.textContent = issue.description || dailyDialog.dataset.noDescription;
+        article.append(header, title, description);
+        if (issue.status) {
+            const status = document.createElement('span');
+            status.className = 'daily-issue-status';
+            status.textContent = issue.status;
+            article.append(status);
+        }
+        if (issue.unassigned) {
+            const unassigned = document.createElement('span');
+            unassigned.className = 'daily-issue-status daily-issue-unassigned';
+            unassigned.textContent = dailyDialog.dataset.unassigned;
+            article.append(unassigned);
+        }
+
+        return article;
+    };
+
     const renderDailyIssues = (container, issues) => {
-        container.replaceChildren();
-        issues.forEach((issue) => {
-            const article = document.createElement('article');
-            article.className = 'daily-issue';
-            const header = document.createElement('div');
-            header.className = 'daily-issue-header';
-            const key = document.createElement('a');
-            key.href = issue.url;
-            key.target = '_blank';
-            key.rel = 'noopener';
-            key.textContent = issue.key;
-            const time = document.createElement('strong');
-            time.className = 'daily-time';
-            time.textContent = issue.timeSpent || dailyDialog.dataset.noTime;
-            header.append(key, time);
+        container.replaceChildren(...issues.map(dailyIssueElement));
+    };
+
+    const renderDailyIssueGroups = (container, groups) => {
+        container.replaceChildren(...groups.map((group, index) => {
+            const section = document.createElement('section');
+            section.className = 'daily-sprint-group';
+            section.classList.toggle('is-expanded', index === 0);
+            const heading = document.createElement('div');
+            heading.className = 'daily-sprint-heading';
             const title = document.createElement('h4');
-            title.textContent = issue.summary;
-            const description = document.createElement('p');
-            description.textContent = issue.description || dailyDialog.dataset.noDescription;
-            article.append(header, title, description);
-            if (issue.status) {
-                const status = document.createElement('span');
-                status.className = 'daily-issue-status';
-                status.textContent = issue.status;
-                article.append(status);
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'daily-sprint-toggle';
+            const issues = document.createElement('div');
+            issues.className = 'daily-sprint-issues';
+            issues.id = `daily-sprint-issues-${index}`;
+            issues.hidden = index !== 0;
+            toggle.setAttribute('aria-controls', issues.id);
+            toggle.setAttribute('aria-expanded', String(!issues.hidden));
+            const label = document.createElement('span');
+            label.textContent = group.sprint?.name || dailyDialog.dataset.noSprint;
+            toggle.append(label);
+            title.append(toggle);
+            heading.append(title);
+            if (group.sprint) {
+                const badges = document.createElement('div');
+                badges.className = 'daily-sprint-badges';
+                const state = document.createElement('span');
+                state.className = 'daily-sprint-badge';
+                state.textContent = group.sprint.state.toUpperCase();
+                badges.append(state);
+                if (group.sprint.primary) {
+                    const primary = document.createElement('span');
+                    primary.className = 'daily-sprint-badge daily-sprint-primary';
+                    primary.textContent = dailyDialog.dataset.primaryTeam;
+                    badges.append(primary);
+                }
+                heading.append(badges);
             }
-            container.append(article);
-        });
+            issues.append(...group.issues.map(dailyIssueElement));
+            toggle.addEventListener('click', () => {
+                const expand = issues.hidden;
+                container.querySelectorAll('.daily-sprint-issues').forEach((candidate) => {
+                    candidate.hidden = true;
+                });
+                container.querySelectorAll('.daily-sprint-toggle').forEach((candidate) => {
+                    candidate.setAttribute('aria-expanded', 'false');
+                });
+                container.querySelectorAll('.daily-sprint-group').forEach((candidate) => {
+                    candidate.classList.remove('is-expanded');
+                });
+                issues.hidden = !expand;
+                toggle.setAttribute('aria-expanded', String(expand));
+                section.classList.toggle('is-expanded', expand);
+            });
+            section.append(heading, issues);
+
+            return section;
+        }));
+    };
+
+    const showDailyLoader = () => {
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        loader.setAttribute('aria-hidden', 'true');
+        dailyStatus.replaceChildren(loader);
+        dailyStatus.classList.add('daily-loading');
+        dailyStatus.setAttribute('aria-label', dailyDialog.dataset.loading);
+    };
+
+    const showDailyStatus = (message) => {
+        dailyStatus.classList.remove('daily-loading');
+        dailyStatus.removeAttribute('aria-label');
+        dailyStatus.textContent = message;
     };
 
     const openDailyDialog = async () => {
         dailyController?.abort();
         dailyController = new AbortController();
-        dailyStatus.textContent = dailyDialog.dataset.loading;
+        showDailyLoader();
         dailyColumns.hidden = true;
         dailyDialog.showModal();
 
@@ -139,16 +221,16 @@
             if (payload === null) return;
 
             renderDailyIssues(dailyReportedList, payload.lastReportedIssues);
-            renderDailyIssues(dailyAssignedList, payload.assignedIssues);
+            renderDailyIssueGroups(dailyAssignedList, payload.assignedIssueGroups);
             dailyReportedDate.textContent = payload.lastReportedDate || '';
             dailyReportedDate.dateTime = payload.lastReportedDate || '';
             dailyStatuses.textContent = payload.statuses.join(' · ');
             dailyReportedEmpty.hidden = payload.lastReportedIssues.length > 0;
             dailyAssignedEmpty.hidden = payload.assignedIssues.length > 0;
-            dailyStatus.textContent = '';
+            showDailyStatus('');
             dailyColumns.hidden = false;
         } catch (error) {
-            if (error.name !== 'AbortError') dailyStatus.textContent = error.message;
+            if (error.name !== 'AbortError') showDailyStatus(error.message);
         }
     };
 

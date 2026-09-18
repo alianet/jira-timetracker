@@ -12,7 +12,7 @@ interface JsonHttpTransport
     /**
      * @param array<array-key, mixed>|null $body
      * @param array<array-key, mixed>|null $query
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      * @throws HttpTransportException
      * @throws \JsonException
      */

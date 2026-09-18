@@ -41,8 +41,8 @@ to token wygenerowany dla tego samego konta. W tym trybie nie konfigurujesz
 
 W tym trybie wymagane jest utworzenie aplikacji OAuth 2.0 (3LO) w konsoli
 deweloperskiej Atlassian. Ustaw callback na `http://localhost:81/oauth/callback`,
-dodaj zakresy `read:jira-work`, `write:jira-work`, `read:jira-user` oraz
-`offline_access`, a następnie uzupełnij `.env`:
+dodaj zakresy `read:jira-work`, `write:jira-work`, `read:jira-user`,
+`read:sprint:jira-software` oraz `offline_access`, a następnie uzupełnij `.env`:
 
 ```dotenv
 JIRA_URL=https://twoja-firma.atlassian.net
@@ -205,6 +205,9 @@ LOG_LEVEL=error
 
 `DAILY_STATUSES` to rozdzielona przecinkami lista statusów Jiry używana w oknie
 Daily do pobierania zadań przypisanych do bieżącego użytkownika.
+`DAILY_PRIMARY_BOARD_ID` jest opcjonalnym ID głównego boardu zespołu. Sprinty z
+tym `originBoardId` są oznaczane jako główne i wyświetlane przed pozostałymi
+sprintami o tym samym stanie.
 Wartość `human` używa zapisu godzin i minut (`7h14m`), a `decimal` godzin
 dziesiętnych zaokrąglonych do dwóch miejsc (`7,25`). Domyślna wartość to `human`.
 

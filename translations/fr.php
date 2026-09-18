@@ -91,6 +91,9 @@ return [
     'daily.no_assigned_issues' => 'Aucun ticket attribué dans les statuts configurés.',
     'daily.no_description' => 'Aucune description.',
     'daily.no_time' => '0m',
+    'daily.no_sprint' => 'Sans sprint',
+    'daily.primary_team' => 'Équipe principale',
+    'daily.unassigned' => 'Non attribué',
 
     'worklog.title' => 'Saisie du temps',
     'worklog.history' => 'Historique des saisies de temps',

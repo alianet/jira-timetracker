@@ -48,6 +48,19 @@ final readonly class Config
         return $value === null || trim($value) === '' ? null : $value;
     }
 
+    public function nullablePositiveInt(string $name): ?int
+    {
+        $value = $this->nullable($name);
+        if ($value === null) {
+            return null;
+        }
+        if (!ctype_digit($value) || (int) $value <= 0) {
+            throw ApplicationConfigException::invalidValue($name, 'dodatnia liczba całkowita');
+        }
+
+        return (int) $value;
+    }
+
     private static function read(string $path): string
     {
         try {

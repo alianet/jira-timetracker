@@ -19,6 +19,14 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class AtlassianOAuthTest extends TestCase
 {
+    public function testRequestsTheSprintScopeNeededForDailyBoardFiltering(): void
+    {
+        self::assertStringContainsString(
+            'read%3Asprint%3Ajira-software',
+            $this->oauth(new MockHttpClient([]), new MemoryTokenStore())->authorizationUrl('state'),
+        );
+    }
+
     public function testExchangesCodeAndMapsMatchingSiteWithoutExposingProviderPayload(): void
     {
         $http = new MockHttpClient([

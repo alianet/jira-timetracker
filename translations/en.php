@@ -91,6 +91,9 @@ return [
     'daily.no_assigned_issues' => 'No assigned issues in the configured statuses.',
     'daily.no_description' => 'No description.',
     'daily.no_time' => '0m',
+    'daily.no_sprint' => 'No sprint',
+    'daily.primary_team' => 'Primary team',
+    'daily.unassigned' => 'Unassigned',
 
     'worklog.title' => 'Time logging',
     'worklog.history' => 'Time entry history',

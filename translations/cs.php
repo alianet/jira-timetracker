@@ -91,6 +91,9 @@ return [
     'daily.no_assigned_issues' => 'V nakonfigurovaných stavech nejsou žádné přiřazené úkoly.',
     'daily.no_description' => 'Bez popisu.',
     'daily.no_time' => '0m',
+    'daily.no_sprint' => 'Bez sprintu',
+    'daily.primary_team' => 'Hlavní tým',
+    'daily.unassigned' => 'Nepřiřazené',
 
     'worklog.title' => 'Zápis času',
     'worklog.history' => 'Historie pracovních záznamů',

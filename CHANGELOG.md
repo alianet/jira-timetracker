@@ -13,6 +13,12 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
   spent, and the current status for assigned issues.
 - Added the `DAILY_STATUSES` setting for configuring which Jira statuses are
   included in the assigned-issues column.
+- Assigned issues are now grouped into collapsible active and future sprint
+  sections, with issues outside a sprint collected separately.
+- Added the optional `DAILY_PRIMARY_BOARD_ID` setting for prioritizing the team's
+  sprints and including unassigned issues from its active sprint.
+- Company OAuth authorization now requests Jira Software sprint read access needed
+  to load the configured board's active sprints.
 
 ### Time reporting
 

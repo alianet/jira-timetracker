@@ -26,7 +26,7 @@ use function Safe\parse_url;
 
 final readonly class AtlassianOAuth implements AuthorizationGateway, ConnectionProvider
 {
-    private const string SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access';
+    private const string SCOPES = 'read:jira-work write:jira-work read:jira-user read:sprint:jira-software offline_access';
 
     public function __construct(
         private string $clientId,

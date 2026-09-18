@@ -42,7 +42,8 @@ ATLASSIAN_API_TOKEN=...
 
 Dieser Modus erfordert eine OAuth-2.0-App (3LO) in der Atlassian Developer Console.
 Setzen Sie den Callback auf `http://localhost:81/oauth/callback`, fügen Sie die Scopes
-`read:jira-work`, `write:jira-work`, `read:jira-user` und `offline_access` hinzu und
+`read:jira-work`, `write:jira-work`, `read:jira-user`, `read:sprint:jira-software` und
+`offline_access` hinzu und
 ergänzen Sie `.env`:
 
 ```dotenv

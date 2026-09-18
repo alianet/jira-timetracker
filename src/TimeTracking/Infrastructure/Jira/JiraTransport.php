@@ -12,7 +12,7 @@ interface JiraTransport
     /**
      * @param array<array-key, mixed>|null $body
      * @param array<array-key, mixed>|null $query
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function request(string $method, string $path, ?array $body = null, ?array $query = null): array;
 }

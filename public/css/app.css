@@ -122,19 +122,42 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .daily-heading h2 { margin: 5px 0 0; }
 .daily-status { margin: 0; padding: 30px 0; text-align: center; }
 .daily-status:empty { display: none; }
+.daily-status.daily-loading { display: grid; justify-items: center; }
+.loader { width: 50px; aspect-ratio: 1; display: grid; -webkit-mask: conic-gradient(from 15deg, #0000, #000); animation: l26 1s infinite steps(12); }
+.loader, .loader:before, .loader:after { background: radial-gradient(closest-side at 50% 12.5%, #175cd3 96%, #0000) 50% 0 / 20% 80% repeat-y, radial-gradient(closest-side at 12.5% 50%, #175cd3 96%, #0000) 0 50% / 80% 20% repeat-x; }
+.loader:before, .loader:after { content: ''; grid-area: 1 / 1; transform: rotate(30deg); }
+.loader:after { transform: rotate(60deg); }
+@keyframes l26 { 100% { transform: rotate(1turn); } }
 .daily-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.daily-columns[hidden] { display: none; }
 .daily-column { min-width: 0; padding: 16px; border: 1px solid #e4e7ec; border-radius: 12px; background: #f9fafb; }
 .daily-column-heading { display: flex; min-height: 52px; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .daily-column-heading h3 { margin: 4px 0 0; font-size: 1rem; }
 .daily-date, .daily-statuses { color: #475467; font-size: .75rem; font-weight: 700; text-align: right; }
 .daily-statuses { max-width: 48%; }
 .daily-list { display: grid; max-height: min(590px, calc(100dvh - 245px)); gap: 8px; overflow-y: auto; }
+.daily-sprint-group { display: grid; gap: 8px; border: 1px solid transparent; border-radius: 9px; }
+.daily-sprint-group.is-expanded { padding: 8px; border-color: #b2ccff; background: #f5faff; }
+.daily-sprint-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 4px 2px 8px; border-bottom: 1px solid #d0d5dd; }
+.daily-sprint-group.is-expanded .daily-sprint-heading { border-color: #b2ccff; }
+.daily-sprint-heading h4 { margin: 0; }
+.daily-sprint-toggle { display: flex; min-width: 0; align-items: center; gap: 9px; border: 0; padding: 0; color: #344054; background: transparent; font: inherit; font-size: .86rem; font-weight: 700; text-align: left; cursor: pointer; }
+.daily-sprint-group.is-expanded .daily-sprint-toggle { color: #175cd3; }
+.daily-sprint-toggle::after { content: '▾'; min-width: 14px; color: #475467; font-size: 1.15rem; line-height: 1; }
+.daily-sprint-toggle[aria-expanded="false"]::after { content: '▸'; }
+.daily-sprint-toggle:focus-visible { outline: 2px solid #2e90fa; outline-offset: 3px; }
+.daily-sprint-badges { display: flex; flex-wrap: wrap; justify-content: end; gap: 4px; }
+.daily-sprint-badge { border-radius: 999px; padding: 3px 7px; color: #344054; background: #eaecf0; font-size: .62rem; font-weight: 750; }
+.daily-sprint-primary { color: #175cd3; background: #eff8ff; }
+.daily-sprint-issues { display: grid; gap: 8px; }
+.daily-sprint-issues[hidden] { display: none; }
 .daily-issue { position: relative; padding: 13px 14px; border: 1px solid #eaecf0; border-radius: 10px; background: white; }
 .daily-issue-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .daily-issue h4 { margin: 7px 0 5px; color: #344054; font-size: .92rem; }
 .daily-issue p { display: -webkit-box; overflow: hidden; margin: 0; color: #667085; font-size: .8rem; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .daily-time { flex-shrink: 0; color: #175cd3; font-size: .8rem; }
 .daily-issue-status { display: inline-flex; margin-top: 9px; border-radius: 999px; padding: 3px 8px; color: #344054; background: #f2f4f7; font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+.daily-issue-unassigned { margin-left: 4px; color: #175cd3; background: #eff8ff; }
 .daily-empty { padding: 35px 12px; text-align: center; }
 .worklog-form { display: grid; gap: 18px; padding: 24px; }
 .worklog-edit-only[hidden] { display: none; }
