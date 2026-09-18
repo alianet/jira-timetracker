@@ -5,6 +5,8 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-18
+
 ### Daily overview
 
 - Added a responsive Daily dialog showing issues from the current user's most
@@ -172,5 +174,6 @@ The first stable release of Jira Time Tracker.
 - Automated unit and architecture tests, static analysis, code style checks, and
   syntax validation run with the shared `composer php:all` command.
 
+[1.2.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.2.0
 [1.1.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.1.0
 [1.0.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.0.0
