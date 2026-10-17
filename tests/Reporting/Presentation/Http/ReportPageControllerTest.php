@@ -51,6 +51,7 @@ final class ReportPageControllerTest extends TestCase
                 self::assertSame('csrf', $context['report']->csrfToken);
                 self::assertSame('Site', $context['report']->siteName);
                 self::assertTrue($context['report']->exportEnabled);
+                self::assertTrue($context['report']->descriptionRequired);
                 self::assertTrue($context['report']->saved);
                 self::assertCount(29, $context['report']->days);
                 self::assertNotEmpty($context['report']->worklogTags);
@@ -70,6 +71,7 @@ final class ReportPageControllerTest extends TestCase
             static fn(): GenerateMonthlyReportHandler => $generate,
             static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
             new WorklogTagProvider(),
+            true,
             true,
             $timezone,
         );
@@ -104,6 +106,7 @@ final class ReportPageControllerTest extends TestCase
             static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
             new WorklogTagProvider(),
             true,
+            true,
             $timezone,
         );
         $sessionData = [
@@ -131,6 +134,8 @@ final class ReportPageControllerTest extends TestCase
         self::assertStringContainsString('month=3&amp;year=2024', $html);
         self::assertStringContainsString('>Bieżący</a>', $html);
         self::assertStringContainsString('id="worklog-form" method="post" action="/worklogs"', $html);
+        self::assertMatchesRegularExpression('#<textarea id="worklog-comment"[^>]* required></textarea>#', $html);
+        self::assertStringContainsString('data-description-required-message="Podaj opis wpisu czasu."', $html);
         self::assertStringNotContainsString('name="action"', $html);
         self::assertStringContainsString('id="user-search-form"', $html);
         self::assertStringContainsString('id="issue-search-form"', $html);

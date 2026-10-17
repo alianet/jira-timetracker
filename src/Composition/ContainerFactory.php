@@ -246,6 +246,7 @@ final class ContainerFactory
             ->setArgument('$complete', $handler(CompleteAuthorizationHandler::class))
             ->setArgument('$logout', $handler(LogoutHandler::class));
         $container->autowire(WorklogController::class)
+            ->setFactory([self::class, 'worklogController'])
             ->setArgument('$addHandler', $handler(AddWorklogHandler::class))
             ->setArgument('$updateHandler', $handler(UpdateWorklogHandler::class))
             ->setArgument('$deleteHandler', $handler(DeleteWorklogHandler::class));
@@ -410,7 +411,8 @@ final class ContainerFactory
         callable $generateReport,
         callable $viewFactory,
         WorklogTagProvider $tagProvider,
-        ReportExportConfig $config,
+        ReportExportConfig $exportConfig,
+        Config $config,
         ReportTimeZone $timezone,
         LoggerInterface $logger,
     ): ReportPageController {
@@ -419,8 +421,30 @@ final class ContainerFactory
             $generateReport,
             $viewFactory,
             $tagProvider,
-            $config->enabled,
+            $exportConfig->enabled,
+            $config->boolean('WORKLOG_DESCRIPTION_REQUIRED'),
             $timezone,
+            $logger,
+        );
+    }
+
+    /**
+     * @param callable(): AddWorklogHandler $addHandler
+     * @param callable(): UpdateWorklogHandler $updateHandler
+     * @param callable(): DeleteWorklogHandler $deleteHandler
+     */
+    public static function worklogController(
+        callable $addHandler,
+        callable $updateHandler,
+        callable $deleteHandler,
+        Config $config,
+        LoggerInterface $logger,
+    ): WorklogController {
+        return new WorklogController(
+            $addHandler,
+            $updateHandler,
+            $deleteHandler,
+            $config->boolean('WORKLOG_DESCRIPTION_REQUIRED'),
             $logger,
         );
     }

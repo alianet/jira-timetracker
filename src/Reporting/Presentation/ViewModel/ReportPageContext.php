@@ -14,5 +14,6 @@ final readonly class ReportPageContext
         public string $siteUrl,
         public string $csrfToken,
         public bool $exportEnabled,
+        public bool $descriptionRequired,
     ) {}
 }

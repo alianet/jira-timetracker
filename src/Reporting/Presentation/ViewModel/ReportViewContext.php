@@ -23,6 +23,7 @@ final readonly class ReportViewContext
         public string $siteUrl,
         public string $csrfToken,
         public bool $exportEnabled,
+        public bool $descriptionRequired,
         public bool $saved,
         public int $currentYear,
         public int $currentMonth,

@@ -194,6 +194,7 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["PODSUMOWANIE","","Suma czasu pracy:","","{total_minutes}","{total_hours} godz. {total_remaining_minutes} min."]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+WORKLOG_DESCRIPTION_REQUIRED=false
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -202,6 +203,9 @@ LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` określa sposób wyświetlania czasu na stronie raportu.
+
+`WORKLOG_DESCRIPTION_REQUIRED=true` wymaga niepustego opisu podczas dodawania i edycji
+wpisu czasu. Domyślnie opcja jest wyłączona (`false`).
 
 `DAILY_STATUSES` to rozdzielona przecinkami lista statusów Jiry używana w oknie
 Daily do pobierania zadań przypisanych do bieżącego użytkownika.

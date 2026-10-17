@@ -106,6 +106,7 @@ return [
     'worklog.time_placeholder' => 'e.g. 7.5h or 1h 30m',
     'worklog.comment' => 'Comment',
     'worklog.comment_placeholder' => 'What was done?',
+    'worklog.description_required' => 'Enter a description for the time entry.',
     'worklog.tags' => 'Tags',
     'worklog.save' => 'Save in Jira',
     'worklog.add' => 'Add in Jira',

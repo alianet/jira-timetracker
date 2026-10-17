@@ -187,6 +187,7 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SUMMARY","","Work time total:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+WORKLOG_DESCRIPTION_REQUIRED=false
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -195,6 +196,9 @@ LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` controls how durations are displayed on the report page.
+
+`WORKLOG_DESCRIPTION_REQUIRED=true` requires a non-empty description when creating or
+editing a worklog. It defaults to `false`.
 
 `DAILY_STATUSES` is a comma-separated list of Jira statuses used by the Daily
 dialog when loading issues assigned to the current user.

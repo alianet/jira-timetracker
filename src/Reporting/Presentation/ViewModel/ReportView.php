@@ -41,6 +41,7 @@ final readonly class ReportView
         public string $siteUrl,
         public string $csrfToken,
         public bool $exportEnabled,
+        public bool $descriptionRequired,
         public bool $saved,
         public array $years,
         public array $worklogTags,

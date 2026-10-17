@@ -106,6 +106,7 @@ return [
     'worklog.time_placeholder' => 'např. 7,5h nebo 1h 30m',
     'worklog.comment' => 'Komentář',
     'worklog.comment_placeholder' => 'Co bylo provedeno?',
+    'worklog.description_required' => 'Zadejte popis pracovního záznamu.',
     'worklog.tags' => 'Štítky',
     'worklog.save' => 'Uložit do Jiry',
     'worklog.add' => 'Přidat do Jiry',

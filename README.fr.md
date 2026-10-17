@@ -196,6 +196,7 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["RÉSUMÉ","","Temps de travail total :","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+WORKLOG_DESCRIPTION_REQUIRED=false
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -204,6 +205,9 @@ LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` définit l’affichage du temps sur la page du rapport.
+
+`WORKLOG_DESCRIPTION_REQUIRED=true` impose une description non vide lors de la création
+ou de la modification d’une saisie de temps. La valeur par défaut est `false`.
 La valeur `human` utilise les heures et minutes (`7h14m`), tandis que `decimal`
 affiche les heures décimales arrondies à deux décimales (`7,25`). La valeur par
 défaut est `human`.

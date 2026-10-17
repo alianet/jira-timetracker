@@ -14,6 +14,7 @@
             data-edit-button="{{ t('worklog.edit') }}"
             data-delete-button="{{ t('worklog.delete') }}"
             data-delete-confirm="{{ t('worklog.confirm_delete') }}"
+            data-description-required-message="{{ t('worklog.description_required') }}"
             data-log-time="{{ t('search.log_time') }}"
             data-history-kind="{{ t('worklog.history') }}"
             data-log-kind="{{ t('worklog.title') }}">
@@ -44,7 +45,7 @@
             <div class="comment-tools worklog-edit-only">
                 <label>{{ t('worklog.comment') }}
                     <textarea id="worklog-comment" name="comment" rows="5"
-                              placeholder="{{ t('worklog.comment_placeholder') }}"></textarea>
+                              placeholder="{{ t('worklog.comment_placeholder') }}"{% if report.descriptionRequired %} required{% endif %}></textarea>
                 </label>
                 <div class="tag-picker" aria-label="{{ t('worklog.tags') }}">
                     <span>{{ t('worklog.tags') }}</span>

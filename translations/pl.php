@@ -106,6 +106,7 @@ return [
     'worklog.time_placeholder' => 'np. 7,5h lub 1h 30m',
     'worklog.comment' => 'Komentarz',
     'worklog.comment_placeholder' => 'Co zostało zrobione?',
+    'worklog.description_required' => 'Podaj opis wpisu czasu.',
     'worklog.tags' => 'Tagi',
     'worklog.save' => 'Zapisz w Jirze',
     'worklog.add' => 'Dodaj w Jirze',

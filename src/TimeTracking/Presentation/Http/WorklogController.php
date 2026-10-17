@@ -32,12 +32,14 @@ final readonly class WorklogController
         private mixed $addHandler,
         private mixed $updateHandler,
         private mixed $deleteHandler,
+        private bool $descriptionRequired = false,
         private LoggerInterface $logger = new NullLogger(),
     ) {}
 
     public function create(Request $request): Response
     {
         $this->verifyCsrf($request);
+        $this->verifyDescription($request);
         $saved = ($this->addHandler)()->handle(new AddWorklog(
             $this->field($request, 'issue'),
             $this->field($request, 'date'),
@@ -56,6 +58,7 @@ final readonly class WorklogController
     public function update(Request $request): Response
     {
         $this->verifyCsrf($request);
+        $this->verifyDescription($request);
         $saved = ($this->updateHandler)()->handle(new UpdateWorklog(
             $this->field($request, 'issue'),
             $this->field($request, 'date'),
@@ -116,6 +119,13 @@ final readonly class WorklogController
                 'path' => $request->path,
             ]);
             throw WorkLogRuntimeException::create('Sesja formularza wygasła. Odśwież stronę i spróbuj ponownie.');
+        }
+    }
+
+    private function verifyDescription(Request $request): void
+    {
+        if ($this->descriptionRequired && trim($this->field($request, 'comment')) === '') {
+            throw WorkLogRuntimeException::create('Opis wpisu czasu jest wymagany.');
         }
     }
 

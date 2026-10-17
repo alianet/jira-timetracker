@@ -62,6 +62,7 @@
         editButton: dialog.dataset.editButton,
         deleteButton: dialog.dataset.deleteButton,
         deleteConfirm: dialog.dataset.deleteConfirm,
+        descriptionRequiredMessage: dialog.dataset.descriptionRequiredMessage,
         logTime: dialog.dataset.logTime,
         historyKind: dialog.dataset.historyKind,
         logKind: dialog.dataset.logKind,
@@ -510,7 +511,15 @@
     timeInput.addEventListener('blur', () => {
         timeInput.value = normalizeTimeSpent(timeInput.value);
     });
+    commentInput.addEventListener('input', () => commentInput.setCustomValidity(''));
     worklogForm.addEventListener('submit', (event) => {
+        if (commentInput.required && commentInput.value.trim() === '') {
+            event.preventDefault();
+            commentInput.setCustomValidity(i18n.descriptionRequiredMessage);
+            commentInput.reportValidity();
+            return;
+        }
+
         if (worklogSubmitting) {
             event.preventDefault();
             return;

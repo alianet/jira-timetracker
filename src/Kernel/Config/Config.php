@@ -61,6 +61,18 @@ final readonly class Config
         return (int) $value;
     }
 
+    public function boolean(string $name, bool $default = false): bool
+    {
+        $value = $this->nullable($name);
+        if ($value === null) {
+            return $default;
+        }
+
+        $parsed = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+
+        return $parsed ?? throw ApplicationConfigException::invalidValue($name, 'true albo false');
+    }
+
     private static function read(string $path): string
     {
         try {

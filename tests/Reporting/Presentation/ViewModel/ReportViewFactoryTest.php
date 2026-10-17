@@ -60,6 +60,7 @@ final class ReportViewFactoryTest extends TestCase
             'csrf-token',
             true,
             true,
+            true,
             2024,
             2,
             [2023, 2024],
@@ -83,6 +84,7 @@ final class ReportViewFactoryTest extends TestCase
         self::assertSame('7h14m', $view->totalTime);
         self::assertSame('csrf-token', $view->csrfToken);
         self::assertTrue($view->exportEnabled);
+        self::assertTrue($view->descriptionRequired);
         self::assertSame(2023, $view->previousYear);
         self::assertSame(12, $view->previousMonth);
         self::assertSame(2024, $view->nextYear);

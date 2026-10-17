@@ -186,6 +186,7 @@ REPORT_EXPORT_FILENAME={username}_{year}_{month}.csv
 REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SOUHRN","","Celkový pracovní čas:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
+WORKLOG_DESCRIPTION_REQUIRED=false
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -194,6 +195,9 @@ LOG_LEVEL=error
 ```
 
 `REPORT_TIME_FORMAT` určuje způsob zobrazení času na stránce přehledu.
+
+`WORKLOG_DESCRIPTION_REQUIRED=true` vyžaduje neprázdný popis při vytvoření a úpravě
+pracovního záznamu. Výchozí hodnota je `false`.
 Hodnota `human` používá hodiny a minuty (`7h14m`), zatímco `decimal` zobrazuje
 desetinné hodiny zaokrouhlené na dvě desetinná místa (`7,25`). Výchozí hodnota je
 `human`.

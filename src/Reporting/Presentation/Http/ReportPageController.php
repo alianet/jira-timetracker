@@ -39,6 +39,7 @@ final readonly class ReportPageController
         private mixed $viewFactory,
         private WorklogTagProvider $tagProvider,
         private bool $exportEnabled,
+        private bool $descriptionRequired,
         private ReportTimeZone $timezone,
         private LoggerInterface $logger = new NullLogger(),
     ) {}
@@ -73,6 +74,7 @@ final readonly class ReportPageController
             siteUrl: ApiValue::stringValue($site['site_url'] ?? null),
             csrfToken: ApiValue::stringValue($request->session->get('csrf_token')),
             exportEnabled: $this->exportEnabled,
+            descriptionRequired: $this->descriptionRequired,
         );
         $view = ($this->viewFactory)()->create($generated->report, new ReportViewContext(
             accountId: $generated->accountId,
@@ -84,6 +86,7 @@ final readonly class ReportPageController
             siteUrl: $pageContext->siteUrl,
             csrfToken: $pageContext->csrfToken,
             exportEnabled: $pageContext->exportEnabled,
+            descriptionRequired: $pageContext->descriptionRequired,
             saved: ($query['saved'] ?? '') === '1',
             currentYear: (int) $reportQuery->now->format('Y'),
             currentMonth: (int) $reportQuery->now->format('n'),

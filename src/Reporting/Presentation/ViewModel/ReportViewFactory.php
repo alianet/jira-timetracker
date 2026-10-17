@@ -93,6 +93,7 @@ final readonly class ReportViewFactory
             siteUrl: $context->siteUrl,
             csrfToken: $context->csrfToken,
             exportEnabled: $context->exportEnabled,
+            descriptionRequired: $context->descriptionRequired,
             saved: $context->saved,
             years: $context->years,
             worklogTags: $context->worklogTags,

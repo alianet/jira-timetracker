@@ -138,6 +138,34 @@ final class HttpRoutingIntegrationTest extends TestCase
         self::assertCount(1, $gateway->added);
     }
 
+    public function testRequiredDescriptionRejectsBlankCreateAndUpdateBeforeCallingHandlers(): void
+    {
+        $gateway = new RecordingWorklogGateway();
+        $controller = $this->worklogs($gateway, true);
+        $sessionData = ['csrf_token' => 'known'];
+        $session = new Session($sessionData);
+        $common = [
+            'csrf_token' => 'known', 'issue' => 'APP-7', 'date' => '2026-08-31',
+            'time_spent' => '1h', 'comment' => " \n ",
+        ];
+        $requests = [
+            ['create', new Request('POST', '/worklogs', [], $common, [], $session)],
+            ['update', new Request('POST', '/worklogs/42', [], $common, ['id' => '42'], $session)],
+        ];
+
+        foreach ($requests as [$method, $request]) {
+            try {
+                $controller->{$method}($request);
+                self::fail('Expected required description failure.');
+            } catch (WorkLogRuntimeException $exception) {
+                self::assertSame('Opis wpisu czasu jest wymagany.', $exception->getMessage());
+            }
+        }
+
+        self::assertSame([], $gateway->added);
+        self::assertSame([], $gateway->updated);
+    }
+
     public function testResponseFactoriesPreserveStatusAndSecurityHeaders(): void
     {
         $json = Response::json(['issues' => []]);
@@ -211,12 +239,13 @@ final class HttpRoutingIntegrationTest extends TestCase
         );
     }
 
-    private function worklogs(WorklogGateway $gateway): WorklogController
+    private function worklogs(WorklogGateway $gateway, bool $descriptionRequired = false): WorklogController
     {
         return new WorklogController(
             static fn(): AddWorklogHandler => new AddWorklogHandler($gateway, JiraTimeFormat::units()),
             static fn(): UpdateWorklogHandler => new UpdateWorklogHandler($gateway, JiraTimeFormat::units()),
             static fn(): DeleteWorklogHandler => new DeleteWorklogHandler($gateway),
+            $descriptionRequired,
         );
     }
 }
