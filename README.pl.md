@@ -195,6 +195,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["PODSUMOWANIE","","Suma czasu pracy:","","{total_minutes}","{total_hours} godz. {total_remaining_minutes} min."]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 WORKLOG_DESCRIPTION_REQUIRED=false
+WORKLOG_TAGS="Analiza,CR,Daily"
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -206,6 +207,13 @@ LOG_LEVEL=error
 
 `WORKLOG_DESCRIPTION_REQUIRED=true` wymaga niepustego opisu podczas dodawania i edycji
 wpisu czasu. Domyślnie opcja jest wyłączona (`false`).
+
+`WORKLOG_TAGS` określa domyślne podpowiedzi opisu, oddzielone przecinkami.
+Brak zmiennej lub pusta wartość oznacza brak domyślnych tagów. Listę można edytować
+w oknie wpisu czasu, podając jeden tag w wierszu, albo całkowicie ją wyczyścić.
+Własna lista jest zapisywana w `localStorage` dla danej witryny i profilu przeglądarki,
+wspólnie dla kont korzystających z tego profilu. Zastępuje domyślne tagi do czasu
+użycia przycisku „Przywróć domyślne”. Zmiana języka interfejsu nie tłumaczy tych tekstów.
 
 `DAILY_STATUSES` to rozdzielona przecinkami lista statusów Jiry używana w oknie
 Daily do pobierania zadań przypisanych do bieżącego użytkownika.

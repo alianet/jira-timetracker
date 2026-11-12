@@ -188,6 +188,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SUMMARY","","Work time total:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 WORKLOG_DESCRIPTION_REQUIRED=false
+WORKLOG_TAGS="Analysis,Code review,Daily"
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -199,6 +200,13 @@ LOG_LEVEL=error
 
 `WORKLOG_DESCRIPTION_REQUIRED=true` requires a non-empty description when creating or
 editing a worklog. It defaults to `false`.
+
+`WORKLOG_TAGS` defines comma-separated default worklog comment suggestions, for example
+`WORKLOG_TAGS="Analysis,Code review,Daily"`. A missing or empty value means no default tags.
+Users can edit the list in the worklog dialog (one tag per line), including clearing it.
+Custom lists are stored in `localStorage` for this browser and site, shared by accounts
+using that browser profile. They override the defaults until **Restore defaults** is used.
+Changing the interface language does not translate these user-defined texts.
 
 `DAILY_STATUSES` is a comma-separated list of Jira statuses used by the Daily
 dialog when loading issues assigned to the current user.

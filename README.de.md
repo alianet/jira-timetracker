@@ -195,6 +195,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SUMME","","Arbeitszeit gesamt:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 WORKLOG_DESCRIPTION_REQUIRED=false
+WORKLOG_TAGS="Analyse,Code-Review,Daily"
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -208,6 +209,15 @@ LOG_LEVEL=error
 Zeiteintrags eine nicht leere Beschreibung. Standardmäßig ist die Option `false`.
 `human` verwendet Stunden und Minuten (`7h14m`), während `decimal` auf zwei
 Dezimalstellen gerundete Stunden anzeigt (`7,25`). Der Standardwert ist `human`.
+
+`WORKLOG_TAGS` definiert die durch Kommas getrennten Standardvorschläge für
+Zeiteintragsbeschreibungen. Fehlt die Variable oder ist sie leer, gibt es keine
+Standard-Tags. Benutzer können die Liste im Zeiteintragsdialog bearbeiten
+(ein Tag pro Zeile) oder vollständig leeren. Eigene Listen werden in `localStorage`
+für die jeweilige Website und das Browserprofil gespeichert und von allen Konten
+in diesem Profil gemeinsam verwendet. Sie ersetzen die Standardliste, bis
+„Standard wiederherstellen“ gewählt wird. Ein Wechsel der Oberflächensprache
+übersetzt diese benutzerdefinierten Texte nicht.
 
 `DAILY_STATUSES` ist eine durch Kommas getrennte Liste von Jira-Status, die im
 Daily-Dialog zum Laden der dem aktuellen Benutzer zugewiesenen Vorgänge verwendet wird.

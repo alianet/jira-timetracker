@@ -197,6 +197,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["RÉSUMÉ","","Temps de travail total :","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 WORKLOG_DESCRIPTION_REQUIRED=false
+WORKLOG_TAGS="Analyse,Revue de code,Daily"
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -211,6 +212,15 @@ ou de la modification d’une saisie de temps. La valeur par défaut est `false`
 La valeur `human` utilise les heures et minutes (`7h14m`), tandis que `decimal`
 affiche les heures décimales arrondies à deux décimales (`7,25`). La valeur par
 défaut est `human`.
+
+`WORKLOG_TAGS` définit les suggestions de description par défaut des saisies de temps,
+séparées par des virgules. Si la variable est absente ou vide, aucune étiquette
+par défaut n’est proposée. Les utilisateurs peuvent modifier la liste dans la fenêtre
+de saisie de temps (une étiquette par ligne), ou la vider entièrement. Les listes
+personnalisées sont enregistrées dans `localStorage` pour ce site et ce profil
+de navigateur, et sont partagées entre les comptes utilisant ce profil. Elles
+remplacent la liste par défaut jusqu’à l’utilisation de « Rétablir les valeurs par défaut ».
+Changer la langue de l’interface ne traduit pas ces textes personnalisés.
 
 `DAILY_STATUSES` est une liste de statuts Jira séparés par des virgules. La fenêtre
 Daily l’utilise pour charger les tickets attribués à l’utilisateur actuel.

@@ -187,6 +187,7 @@ REPORT_EXPORT_BOM=true
 REPORT_EXPORT_SUMMARY_ROW='["SOUHRN","","Celkový pracovní čas:","","{total_minutes}","{total_hours}h {total_remaining_minutes}m"]'
 REPORT_EXPORT_SUMMARY_SPACER=true
 WORKLOG_DESCRIPTION_REQUIRED=false
+WORKLOG_TAGS="Analýza,Revize kódu,Daily"
 REPORT_TIME_FORMAT=human
 DAILY_STATUSES="TO DO,IN PROGRESS"
 DAILY_HOURS_LIMIT=7.5
@@ -201,6 +202,14 @@ pracovního záznamu. Výchozí hodnota je `false`.
 Hodnota `human` používá hodiny a minuty (`7h14m`), zatímco `decimal` zobrazuje
 desetinné hodiny zaokrouhlené na dvě desetinná místa (`7,25`). Výchozí hodnota je
 `human`.
+
+`WORKLOG_TAGS` určuje výchozí návrhy popisu pracovního záznamu oddělené čárkami.
+Pokud proměnná chybí nebo je prázdná, nejsou nastaveny žádné výchozí štítky.
+Uživatelé mohou seznam upravit v dialogu pracovního záznamu (jeden štítek na řádek)
+nebo jej zcela vymazat. Vlastní seznam se ukládá do `localStorage` pro daný web
+a profil prohlížeče a sdílejí jej všechny účty používající tento profil.
+Nahrazuje výchozí seznam, dokud uživatel nezvolí „Obnovit výchozí“.
+Změna jazyka rozhraní tyto uživatelské texty nepřekládá.
 
 `DAILY_STATUSES` je čárkami oddělený seznam stavů Jiry, podle kterého dialog Daily
 načítá úkoly přiřazené aktuálnímu uživateli.
