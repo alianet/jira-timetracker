@@ -23,6 +23,18 @@ final class HolidayCalendarFactoryTest extends TestCase
         self::assertFalse($calendar->isDayOff(new \DateTimeImmutable('2026-05-04')));
     }
 
+    public function testDistinguishesNovemberDayOffFromWorkingObservance(): void
+    {
+        $calendar = new HolidayCalendarFactory()->create(HolidayCalendarFactory::COUNTRY_POLAND);
+        $independenceDay = new \DateTimeImmutable('2026-11-11');
+        $allSoulsDay = new \DateTimeImmutable('2026-11-02');
+
+        self::assertContains('independence_day', $calendar->holidaysOn($independenceDay));
+        self::assertTrue($calendar->isDayOff($independenceDay));
+        self::assertContains('all_souls_day', $calendar->holidaysOn($allSoulsDay));
+        self::assertFalse($calendar->isDayOff($allSoulsDay));
+    }
+
     public function testCreatesRegionalCalendar(): void
     {
         $calendar = new HolidayCalendarFactory()->create(

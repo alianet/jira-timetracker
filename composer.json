@@ -19,7 +19,7 @@
         "symfony/http-client": "^8.1",
         "thecodingmachine/safe": "^3.4",
         "symfony/routing": "^8.1",
-        "umulmrum/holiday": "dev-master#66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
+        "alianet/holiday": "^0.12.0",
         "symfony/dotenv": "^8.1",
         "symfony/config": "^8.1",
         "symfony/translation": "^8.1",

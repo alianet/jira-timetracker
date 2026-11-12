@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cef047104fe1f3740f99dd72d312d9f3",
+    "content-hash": "0ad5eb6a8de7088d1dcd4afa7efb737d",
     "packages": [
         {
             "name": "alianet/env-sync",
@@ -62,6 +62,66 @@
                 "source": "https://github.com/alianet/env-sync"
             },
             "time": "2026-09-11T16:14:31+00:00"
+        },
+        {
+            "name": "alianet/holiday",
+            "version": "0.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alianet/holiday.git",
+                "reference": "1516cf2717ae56234c9cf33e2d3d61fb8097f0e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alianet/holiday/zipball/1516cf2717ae56234c9cf33e2d3d61fb8097f0e7",
+                "reference": "1516cf2717ae56234c9cf33e2d3d61fb8097f0e7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "friendsofphp/php-cs-fixer": "^3.89",
+                "phpstan/phpstan": "~2.1",
+                "phpunit/phpunit": "~11.5|~12.4",
+                "symfony/console": "~5.4|~6.4|~7.0|~8.0",
+                "symfony/translation": "~5.4|~6.4|~7.0|~8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Umulmrum\\Holiday\\": [
+                        "src"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stefan Kruppa",
+                    "email": "stefan@umulmrum.de"
+                },
+                {
+                    "name": "Mariusz Kaczanowski",
+                    "email": "mariusz@alianet.pl"
+                }
+            ],
+            "description": "A PHP library to compute holidays. It's something :-)",
+            "keywords": [
+                "calendar",
+                "date",
+                "holiday",
+                "holidays",
+                "time"
+            ],
+            "support": {
+                "source": "https://github.com/alianet/holiday/tree/0.12.0"
+            },
+            "time": "2026-11-12T20:00:24+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1727,64 +1787,6 @@
                 }
             ],
             "time": "2026-09-25T13:20:01+00:00"
-        },
-        {
-            "name": "umulmrum/holiday",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/umulmrum/holiday.git",
-                "reference": "66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/umulmrum/holiday/zipball/66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
-                "reference": "66f3ed26f886b9b6aa3bdd7ebb7ea9bc10fc2351",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2"
-            },
-            "require-dev": {
-                "ext-json": "*",
-                "friendsofphp/php-cs-fixer": "^3.89",
-                "phpstan/phpstan": "~2.1",
-                "phpunit/phpunit": "~11.5|~12.4",
-                "symfony/console": "~5.4|~6.4|~7.0|~8.0",
-                "symfony/translation": "~5.4|~6.4|~7.0|~8.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Umulmrum\\Holiday\\": [
-                        "src"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Stefan Kruppa",
-                    "email": "stefan@umulmrum.de"
-                }
-            ],
-            "description": "A PHP library to compute holidays. It's something :-)",
-            "keywords": [
-                "calendar",
-                "date",
-                "holiday",
-                "holidays",
-                "time"
-            ],
-            "support": {
-                "issues": "https://github.com/umulmrum/holiday/issues",
-                "source": "https://github.com/umulmrum/holiday/tree/master"
-            },
-            "time": "2025-11-18T20:38:25+00:00"
         }
     ],
     "packages-dev": [
@@ -6555,9 +6557,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "umulmrum/holiday": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
