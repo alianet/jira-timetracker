@@ -5,6 +5,37 @@ the application. The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-12
+
+### Time reporting
+
+- Added the optional `WORKLOG_DESCRIPTION_REQUIRED` setting to require a non-empty
+  description when creating or editing a worklog, with browser and server validation.
+- Moved default worklog comment suggestions to the `WORKLOG_TAGS` setting.
+- Added a tag editor with one suggestion per line, browser-local persistence,
+  support for empty lists, and a restore-defaults action.
+
+### Calendar
+
+- Distinguished holidays that are days off from observances that remain working
+  days, with separate colors, symbols, and a translated legend.
+- Preserved holiday indicators when a holiday falls on a weekend and kept
+  missing-hours alerts visible for working observances.
+- Expanded day tooltips to include the holiday name, day-off status, weekend
+  status, and missing-hours alert when applicable.
+- Replaced `umulmrum/holiday` with `alianet/holiday` 0.12.0, correcting the Polish
+  Independence Day classification on November 11 as a day off.
+
+### Configuration and dependencies
+
+- Changed the example CSV summary row and default worklog tags to English.
+- Updated Composer dependencies and the lock file.
+
+### Documentation
+
+- Documented tag configuration, editing, browser-local storage, and restoring
+  defaults in all six supported README languages.
+
 ## [1.2.0] - 2026-09-18
 
 ### Daily overview
@@ -174,6 +205,8 @@ The first stable release of Jira Time Tracker.
 - Automated unit and architecture tests, static analysis, code style checks, and
   syntax validation run with the shared `composer php:all` command.
 
+[Unreleased]: https://github.com/alianet/jira-timetracker/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.3.0
 [1.2.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.2.0
 [1.1.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.1.0
 [1.0.0]: https://github.com/alianet/jira-timetracker/releases/tag/v1.0.0
