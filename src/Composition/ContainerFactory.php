@@ -241,6 +241,8 @@ final class ContainerFactory
     {
         $handler = static fn(string $id): ServiceClosureArgument => new ServiceClosureArgument(new Reference($id));
 
+        $container->autowire(WorklogTagProvider::class)
+            ->setFactory([self::class, 'worklogTagProvider']);
         $container->autowire(AuthenticationController::class)
             ->setArgument('$start', $handler(StartAuthorizationHandler::class))
             ->setArgument('$complete', $handler(CompleteAuthorizationHandler::class))
@@ -400,6 +402,11 @@ final class ContainerFactory
         Connection $connection,
     ): CsvReportExporter {
         return new CsvReportExporter($config, $translator, self::issueUrl($connection->siteUrl));
+    }
+
+    public static function worklogTagProvider(Config $config): WorklogTagProvider
+    {
+        return new WorklogTagProvider($config->nullable('WORKLOG_TAGS') ?? '');
     }
 
     /**

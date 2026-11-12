@@ -54,7 +54,7 @@ final class ReportPageControllerTest extends TestCase
                 self::assertTrue($context['report']->descriptionRequired);
                 self::assertTrue($context['report']->saved);
                 self::assertCount(29, $context['report']->days);
-                self::assertNotEmpty($context['report']->worklogTags);
+                self::assertSame(['Analysis', 'Code review'], $context['report']->worklogTags);
 
                 return true;
             }))
@@ -70,7 +70,7 @@ final class ReportPageControllerTest extends TestCase
             $twig,
             static fn(): GenerateMonthlyReportHandler => $generate,
             static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
-            new WorklogTagProvider(),
+            new WorklogTagProvider('Analysis,Code review'),
             true,
             true,
             $timezone,
@@ -104,7 +104,7 @@ final class ReportPageControllerTest extends TestCase
             $twig,
             static fn(): GenerateMonthlyReportHandler => $generate,
             static fn(): ReportViewFactory => new ReportViewFactory($translator, $jira->issueUrl(...)),
-            new WorklogTagProvider(),
+            new WorklogTagProvider('Analysis,<script>alert(1)</script>'),
             true,
             true,
             $timezone,
@@ -140,6 +140,10 @@ final class ReportPageControllerTest extends TestCase
         self::assertStringContainsString('id="user-search-form"', $html);
         self::assertStringContainsString('id="issue-search-form"', $html);
         self::assertStringContainsString('id="worklog-dialog"', $html);
+        self::assertStringContainsString('id="worklog-tags-editor" hidden', $html);
+        self::assertStringContainsString('id="worklog-tags-reset"', $html);
+        self::assertStringContainsString('data-tag="Analysis"', $html);
+        self::assertStringContainsString('data-tag="&lt;script&gt;alert(1)&lt;/script&gt;"', $html);
         self::assertStringContainsString('data-default-worklog-date="2024-02-01"', $html);
         self::assertStringContainsString('data-delete-confirm=', $html);
         self::assertStringContainsString('Pokaż tylko zadania z wpisami w dniu 2024-02-01', $html);

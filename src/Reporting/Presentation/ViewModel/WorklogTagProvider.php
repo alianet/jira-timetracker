@@ -9,25 +9,14 @@ namespace App\Reporting\Presentation\ViewModel;
 
 final class WorklogTagProvider
 {
-    /** @var list<string> */
-    private const array TAGS = [
-        'Analiza',
-        'Analiza testów',
-        'CR',
-        'Daily',
-        'Development',
-        'Development po CR',
-        'Przygotowanie raportów',
-        'Spotkanie organizacyjne',
-        'Refinement',
-        'Szkolenie',
-        'Testy',
-        'Wsparcie testów',
-    ];
+    public function __construct(private readonly string $tags = '') {}
 
     /** @return list<string> */
     public function all(): array
     {
-        return self::TAGS;
+        return array_values(array_unique(array_filter(
+            array_map(trim(...), explode(',', $this->tags)),
+            static fn(string $tag): bool => $tag !== '',
+        )));
     }
 }

@@ -322,14 +322,80 @@
         userSearchTimer = window.setTimeout(searchUsers, 300);
     });
 
-    document.querySelectorAll('.comment-tag').forEach((button) => {
-        button.addEventListener('click', () => {
-            const tag = button.dataset.tag || '';
-            const comment = commentInput.value.trimEnd();
-            commentInput.value = comment === '' ? tag : `${comment}, ${tag}`;
-            commentInput.focus();
-            commentInput.setSelectionRange(commentInput.value.length, commentInput.value.length);
-        });
+    const tagCloud = document.getElementById('worklog-tag-cloud');
+    const tagEditor = document.getElementById('worklog-tags-editor');
+    const tagInput = document.getElementById('worklog-tags-input');
+    const tagError = document.getElementById('worklog-tags-error');
+    const tagEditButton = document.getElementById('worklog-tags-edit');
+    const tagStorageKey = 'jira-timetracker.worklog-tags.v1';
+    const defaultTags = Array.from(tagCloud.querySelectorAll('.comment-tag'), (button) => button.dataset.tag);
+    const normalizeTags = (tags) => [...new Set(tags.map((tag) => tag.trim()).filter((tag) => tag !== ''))];
+    let tags = defaultTags;
+
+    const renderTags = () => {
+        tagCloud.replaceChildren(...tags.map((tag) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'comment-tag';
+            button.dataset.tag = tag;
+            button.textContent = tag;
+            return button;
+        }));
+    };
+
+    try {
+        const storedTags = JSON.parse(window.localStorage.getItem(tagStorageKey));
+        if (Array.isArray(storedTags) && storedTags.every((tag) => typeof tag === 'string')) {
+            tags = normalizeTags(storedTags);
+        }
+    } catch {}
+    renderTags();
+
+    tagCloud.addEventListener('click', (event) => {
+        const button = event.target.closest('.comment-tag');
+        if (!button) return;
+        const comment = commentInput.value.trimEnd();
+        commentInput.value = comment === '' ? button.dataset.tag : `${comment}, ${button.dataset.tag}`;
+        commentInput.setCustomValidity('');
+        commentInput.focus();
+        commentInput.setSelectionRange(commentInput.value.length, commentInput.value.length);
+    });
+
+    const closeTagEditor = () => {
+        tagEditor.hidden = true;
+        tagEditButton.hidden = false;
+        tagError.hidden = true;
+    };
+
+    tagEditButton.addEventListener('click', () => {
+        tagInput.value = tags.join('\n');
+        tagEditor.hidden = false;
+        tagEditButton.hidden = true;
+        tagInput.focus();
+    });
+    document.getElementById('worklog-tags-cancel').addEventListener('click', closeTagEditor);
+    document.getElementById('worklog-tags-save').addEventListener('click', () => {
+        const editedTags = normalizeTags(tagInput.value.split(/\r?\n/));
+        try {
+            window.localStorage.setItem(tagStorageKey, JSON.stringify(editedTags));
+        } catch {
+            tagError.hidden = false;
+            return;
+        }
+        tags = editedTags;
+        renderTags();
+        closeTagEditor();
+    });
+    document.getElementById('worklog-tags-reset').addEventListener('click', () => {
+        try {
+            window.localStorage.removeItem(tagStorageKey);
+        } catch {
+            tagError.hidden = false;
+            return;
+        }
+        tags = defaultTags;
+        renderTags();
+        closeTagEditor();
     });
 
     const normalizeTimeSpent = (value) => {
@@ -532,6 +598,7 @@
     dialog.addEventListener('click', (event) => {
         if (event.target === dialog) dialog.close();
     });
+    dialog.addEventListener('close', closeTagEditor);
     dailyButton.addEventListener('click', openDailyDialog);
     dailyDialog.querySelector('.daily-dialog-close').addEventListener('click', () => dailyDialog.close());
     dailyDialog.addEventListener('click', (event) => {

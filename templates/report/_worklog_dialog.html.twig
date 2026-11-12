@@ -49,10 +49,21 @@
                 </label>
                 <div class="tag-picker" aria-label="{{ t('worklog.tags') }}">
                     <span>{{ t('worklog.tags') }}</span>
-                    <div class="tag-cloud">
+                    <div id="worklog-tag-cloud" class="tag-cloud">
                         {% for tag in report.worklogTags %}
                             <button type="button" class="comment-tag" data-tag="{{ tag }}">{{ tag }}</button>
                         {% endfor %}
+                    </div>
+                    <button type="button" id="worklog-tags-edit" class="button-secondary">{{ t('worklog.tags_edit') }}</button>
+                    <div id="worklog-tags-editor" hidden>
+                        <label for="worklog-tags-input">{{ t('worklog.tags_help') }}</label>
+                        <textarea id="worklog-tags-input" rows="6"></textarea>
+                        <div class="tag-editor-actions">
+                            <button type="button" id="worklog-tags-save">{{ t('worklog.tags_save') }}</button>
+                            <button type="button" id="worklog-tags-cancel" class="button-secondary">{{ t('worklog.cancel') }}</button>
+                            <button type="button" id="worklog-tags-reset" class="button-secondary">{{ t('worklog.tags_reset') }}</button>
+                        </div>
+                        <p id="worklog-tags-error" role="alert" hidden>{{ t('worklog.tags_storage_error') }}</p>
                     </div>
                 </div>
             </div>

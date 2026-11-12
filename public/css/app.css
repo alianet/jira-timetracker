@@ -166,6 +166,8 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .comment-tools label, .comment-tools textarea { width: 100%; }
 .tag-picker > span { display: block; margin-bottom: 6px; }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-picker > button { margin-top: 8px; }
+.tag-editor-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .comment-tag { min-height: 28px; padding: 3px 9px; border-color: #b2ccff; border-radius: 999px; color: #175cd3; background: #eff4ff; font-size: .78rem; line-height: 1.2; }
 .comment-tag:hover { border-color: #2e90fa; background: #d1e9ff; }
 .comment-tag:focus-visible { outline: 2px solid #2e90fa; outline-offset: 2px; }
