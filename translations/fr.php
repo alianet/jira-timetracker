@@ -131,6 +131,8 @@ return [
     'search.log_time' => 'Saisir du temps',
 
     'calendar.day.weekend' => 'Week-end',
+    'calendar.day.holiday_day_off' => 'Fête (jour chômé)',
+    'calendar.day.holiday_working' => 'Fête (jour non chômé)',
     'calendar.day.alert' => 'Sous la limite quotidienne',
     'calendar.weekday.short.1' => 'Lun',
     'calendar.weekday.short.2' => 'Mar',

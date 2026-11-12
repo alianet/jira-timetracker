@@ -36,6 +36,8 @@ final class WorkdayPolicyTest extends TestCase
         );
 
         self::assertFalse($policy->describe(new \DateTimeImmutable('2026-05-01'), 0)->alert);
+        self::assertTrue($policy->describe(new \DateTimeImmutable('2026-05-01'), 0)->dayOff);
+        self::assertFalse($policy->describe(new \DateTimeImmutable('2026-05-04'), 0)->dayOff);
         self::assertFalse($policy->describe(new \DateTimeImmutable('2026-05-02'), 0)->alert);
         self::assertTrue($policy->describe(new \DateTimeImmutable('2026-05-04'), 0)->alert);
         self::assertTrue($policy->describe(new \DateTimeImmutable('2026-05-05'), 1)->alert);

@@ -1,4 +1,10 @@
     <section class="table-card">
+        <div class="calendar-legend">
+            <span class="legend-weekend">{{ t('calendar.day.weekend') }}</span>
+            <span class="legend-holiday-off">◆ {{ t('calendar.day.holiday_day_off') }}</span>
+            <span class="legend-holiday-working">◇ {{ t('calendar.day.holiday_working') }}</span>
+            <span class="legend-alert">{{ t('calendar.day.alert') }}</span>
+        </div>
         <div class="table-wrap">
             <table class="matrix-table">
                 <thead>
@@ -14,7 +20,7 @@
                                     aria-pressed="false"
                                     title="{{ dayButtonTitle }}"
                                     aria-label="{{ dayButtonTitle }}">
-                                <span class="day-number">{{ day.number }}</span><br />
+                                <span class="day-number">{{ day.number }}{% if day.holiday %}<span class="holiday-marker" aria-hidden="true">{{ day.dayOff ? '◆' : '◇' }}</span>{% endif %}</span><br />
                                 <span class="weekday-short">{{ t('calendar.weekday.short.' ~ day.weekday) }}</span>
                             </button>
                         </th>

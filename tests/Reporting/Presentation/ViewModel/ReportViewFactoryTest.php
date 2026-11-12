@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Tests\Reporting\Presentation\ViewModel;
 
+use App\Kernel\Presentation\Twig\EnvironmentFactory;
 use App\Reporting\Domain\IssueKey;
 use App\Reporting\Domain\MonthlyReport;
 use App\Reporting\Domain\ReportPeriod;
@@ -28,12 +29,17 @@ final class ReportViewFactoryTest extends TestCase
         $calendar = new class implements \App\Reporting\Domain\Port\HolidayCalendar {
             public function holidaysOn(\DateTimeImmutable $date): array
             {
-                return $date->format('Y-m-d') === '2024-01-01' ? ['new_year'] : [];
+                return match ($date->format('Y-m-d')) {
+                    '2024-01-01' => ['new_year'],
+                    '2024-01-02', '2024-01-04' => ['observance'],
+                    '2024-01-07' => ['weekend_holiday'],
+                    default => [],
+                };
             }
 
             public function isDayOff(\DateTimeImmutable $date): bool
             {
-                return $date->format('Y-m-d') === '2024-01-01';
+                return in_array($date->format('Y-m-d'), ['2024-01-01', '2024-01-07'], true);
             }
         };
         $timezone = ReportTimeZone::fromName('Europe/Warsaw');
@@ -76,9 +82,18 @@ final class ReportViewFactoryTest extends TestCase
             ['id' => '12', 'timeSpent' => '6h 44m', 'comment' => 'Done'],
             ['id' => '11', 'timeSpent' => '30m', 'comment' => ''],
         ], $view->rows[0]->dailyWorklogs[2]);
-        self::assertSame('day-holiday', $view->days[1]->cssClasses);
-        self::assertSame('translated:calendar.holiday.new_year', $view->days[1]->title);
-        self::assertSame('day-alert', $view->days[2]->cssClasses);
+        self::assertSame('day-holiday day-holiday-off', $view->days[1]->cssClasses);
+        self::assertSame('translated:calendar.holiday.new_year — translated:calendar.day.holiday_day_off', $view->days[1]->title);
+        self::assertTrue($view->days[1]->holiday);
+        self::assertTrue($view->days[1]->dayOff);
+        self::assertSame('day-holiday day-holiday-working day-alert', $view->days[2]->cssClasses);
+        self::assertSame('translated:calendar.holiday.observance — translated:calendar.day.holiday_working — translated:calendar.day.alert', $view->days[2]->title);
+        self::assertFalse($view->days[2]->dayOff);
+        self::assertSame('day-holiday day-holiday-working', $view->days[4]->cssClasses);
+        self::assertSame('day-weekend', $view->days[6]->cssClasses);
+        self::assertFalse($view->days[6]->holiday);
+        self::assertSame('day-weekend day-holiday day-holiday-off', $view->days[7]->cssClasses);
+        self::assertSame('translated:calendar.holiday.weekend_holiday — translated:calendar.day.holiday_day_off — translated:calendar.day.weekend', $view->days[7]->title);
         self::assertSame(26099 / 3600, $view->days[2]->totalHours);
         self::assertSame('7h14m', $view->days[2]->totalTime);
         self::assertSame('7h14m', $view->totalTime);
@@ -91,6 +106,13 @@ final class ReportViewFactoryTest extends TestCase
         self::assertSame(2, $view->nextMonth);
         self::assertFalse($view->isCurrentPeriod);
         self::assertSame(['meeting'], $view->worklogTags);
+
+        $twig = new EnvironmentFactory()->create(dirname(__DIR__, 4) . '/templates', $translator);
+        $html = $twig->render('report/_matrix.html.twig', ['report' => $view]);
+        self::assertStringContainsString('class="calendar-legend"', $html);
+        self::assertStringContainsString('1<span class="holiday-marker" aria-hidden="true">◆</span>', $html);
+        self::assertStringContainsString('2<span class="holiday-marker" aria-hidden="true">◇</span>', $html);
+        self::assertStringContainsString('7<span class="holiday-marker" aria-hidden="true">◆</span>', $html);
 
         $decimalView = new ReportViewFactory(
             $translator,

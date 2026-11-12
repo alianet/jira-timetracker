@@ -131,6 +131,8 @@ return [
     'search.log_time' => 'Zeit erfassen',
 
     'calendar.day.weekend' => 'Wochenende',
+    'calendar.day.holiday_day_off' => 'Feiertag (arbeitsfrei)',
+    'calendar.day.holiday_working' => 'Gedenktag (nicht arbeitsfrei)',
     'calendar.day.alert' => 'Unter dem Tageslimit',
     'calendar.weekday.short.1' => 'Mo',
     'calendar.weekday.short.2' => 'Di',

@@ -131,6 +131,8 @@ return [
     'search.log_time' => 'Zapsat čas',
 
     'calendar.day.weekend' => 'Víkend',
+    'calendar.day.holiday_day_off' => 'Svátek (den pracovního klidu)',
+    'calendar.day.holiday_working' => 'Svátek bez pracovního volna',
     'calendar.day.alert' => 'Pod denním limitem',
     'calendar.weekday.short.1' => 'Po',
     'calendar.weekday.short.2' => 'Út',

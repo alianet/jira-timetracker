@@ -102,14 +102,26 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .worklog-trigger:hover { outline: 2px solid #2563eb; outline-offset: 2px; }
 .has-hours .worklog-trigger { letter-spacing: .02em; }
 .matrix-table .day-weekend { color: #6941c6; background: #f4f3ff; }
-.matrix-table .day-holiday { color: #067647; background: #ecfdf3; }
+.matrix-table .day-holiday-working { color: #854a0e; background: #fffaeb; }
+.matrix-table .day-holiday-off { color: #067647; background: #ecfdf3; }
 .matrix-table .day-alert { color: #b42318; background: #fef3f2; }
 .matrix-table thead .day-weekend { box-shadow: inset 0 -3px #9e77ed; }
-.matrix-table thead .day-holiday { box-shadow: inset 0 -3px #12b76a; }
+.matrix-table thead .day-holiday-working { box-shadow: inset 0 -3px #eaaa08; }
+.matrix-table thead .day-holiday-off { box-shadow: inset 0 -3px #12b76a; }
 .matrix-table thead .day-alert { box-shadow: inset 0 -3px #f04438; }
 .matrix-table tfoot .day-weekend { background: #ebe9fe; }
-.matrix-table tfoot .day-holiday { background: #d1fadf; }
+.matrix-table tfoot .day-holiday-working { background: #fef0c7; }
+.matrix-table tfoot .day-holiday-off { background: #d1fadf; }
 .matrix-table tfoot .day-alert { background: #fee4e2; }
+.holiday-marker { margin-left: 3px; font-size: .7rem; }
+.day-holiday-working .holiday-marker { color: #854a0e; }
+.day-holiday-off .holiday-marker { color: #067647; }
+.calendar-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 12px 16px; font-size: .75rem; }
+.calendar-legend span { border-bottom: 3px solid; padding: 2px 4px; }
+.legend-weekend { color: #6941c6; background: #f4f3ff; }
+.legend-holiday-working { color: #854a0e; background: #fffaeb; }
+.legend-holiday-off { color: #067647; background: #ecfdf3; }
+.legend-alert { color: #b42318; background: #fef3f2; }
 .matrix-table .total-column { position: sticky; right: 0; z-index: 2; min-width: 76px; border-left: 2px solid #d0d5dd; background: #f9fafb; }
 .matrix-table tfoot th, .matrix-table tfoot td { position: sticky; bottom: 0; border-top: 2px solid #98a2b3; background: #f2f4f7; font-weight: 800; }
 .matrix-table tfoot .issue-column { z-index: 3; background: #f2f4f7; }
@@ -217,8 +229,9 @@ a { color: #2563eb; font-weight: 750; text-decoration: none; }
 .template-compact .search-form > label { margin-bottom: 4px; }
 .template-compact .search-row input,
 .template-compact .search-row button { min-height: 32px; }
-.template-compact .table-card { min-width: 0; min-height: 0; flex: 1 1 auto; }
-.template-compact .table-wrap { width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: auto; }
+.template-compact .table-card { display: flex; min-width: 0; min-height: 0; flex: 1 1 auto; flex-direction: column; }
+.template-compact .calendar-legend { flex: 0 0 auto; }
+.template-compact .table-wrap { width: 100%; min-width: 0; min-height: 0; flex: 1 1 auto; overflow: auto; }
 .template-compact .matrix-table .issue-column { width: 180px; min-width: 180px; max-width: 180px; }
 .template-compact .matrix-table th,
 .template-compact .matrix-table td { min-width: 44px; padding: 6px 5px; font-size: .75rem; }

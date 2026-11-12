@@ -131,6 +131,8 @@ return [
     'search.log_time' => 'Log time',
 
     'calendar.day.weekend' => 'Weekend',
+    'calendar.day.holiday_day_off' => 'Holiday (day off)',
+    'calendar.day.holiday_working' => 'Observance (not a day off)',
     'calendar.day.alert' => 'Below the daily limit',
     'calendar.weekday.short.1' => 'Mon',
     'calendar.weekday.short.2' => 'Tue',

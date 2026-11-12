@@ -62,6 +62,8 @@ final readonly class ReportViewFactory
                 weekday: $day->weekday,
                 cssClasses: $this->dayClasses($day),
                 title: $this->dayTitle($day),
+                holiday: $day->holidays !== [],
+                dayOff: $day->dayOff,
                 totalHours: self::hours($day->totalSeconds),
                 totalTime: $this->formatTime($day->totalSeconds),
             );
@@ -132,6 +134,7 @@ final readonly class ReportViewFactory
         return implode(' ', array_filter([
             $day->weekend ? 'day-weekend' : null,
             $day->holidays !== [] ? 'day-holiday' : null,
+            $day->holidays !== [] ? ($day->dayOff ? 'day-holiday-off' : 'day-holiday-working') : null,
             $day->alert ? 'day-alert' : null,
             $day->today ? 'day-today' : null,
         ]));
@@ -139,17 +142,23 @@ final readonly class ReportViewFactory
 
     private function dayTitle(ReportDay $day): string
     {
+        $parts = [];
         if ($day->holidays !== []) {
-            return implode(', ', array_map(
+            $parts[] = implode(', ', array_map(
                 fn(string $holiday): string => $this->translator->trans('calendar.holiday.' . $holiday),
                 $day->holidays,
             ));
+            $parts[] = $this->translator->trans($day->dayOff ? 'calendar.day.holiday_day_off' : 'calendar.day.holiday_working');
         }
 
         if ($day->weekend) {
-            return $this->translator->trans('calendar.day.weekend');
+            $parts[] = $this->translator->trans('calendar.day.weekend');
         }
 
-        return $day->alert ? $this->translator->trans('calendar.day.alert') : '';
+        if ($day->alert) {
+            $parts[] = $this->translator->trans('calendar.day.alert');
+        }
+
+        return implode(' — ', $parts);
     }
 }

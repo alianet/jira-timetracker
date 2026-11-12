@@ -14,6 +14,7 @@ final readonly class ReportDay
         public string $date,
         public int $weekday,
         public bool $weekend,
+        public bool $dayOff,
         public array $holidays,
         public bool $alert,
         public bool $today,

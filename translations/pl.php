@@ -131,6 +131,8 @@ return [
     'search.log_time' => 'Zaloguj czas',
 
     'calendar.day.weekend' => 'Weekend',
+    'calendar.day.holiday_day_off' => 'Święto — dzień wolny od pracy',
+    'calendar.day.holiday_working' => 'Święto bez dnia wolnego',
     'calendar.day.alert' => 'Poniżej dziennego limitu',
     'calendar.weekday.short.1' => 'Pon',
     'calendar.weekday.short.2' => 'Wto',

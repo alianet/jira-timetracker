@@ -15,6 +15,8 @@ final readonly class ReportDayView
         public int $weekday,
         public string $cssClasses,
         public string $title,
+        public bool $holiday,
+        public bool $dayOff,
         public float $totalHours,
         public string $totalTime,
     ) {}

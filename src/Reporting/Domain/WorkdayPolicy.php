@@ -35,6 +35,7 @@ final readonly class WorkdayPolicy
             date: $date->format('Y-m-d'),
             weekday: (int) $date->format('N'),
             weekend: $weekend,
+            dayOff: $dayOff,
             holidays: $holidays,
             alert: !$weekend && !$dayOff && $date <= $today && $workedSeconds < $this->requiredSeconds,
             today: $date == $today,
